@@ -1,11 +1,15 @@
 package com.example.healthybet.screens
 
+import android.content.Intent
+import android.widget.Button
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,6 +51,12 @@ fun ConnexionScreen(name: String, modifier: Modifier = Modifier) {
             placeholder = { Text("Enter Password") },
             modifier = textFieldModifier
         )
+
+        Button(onClick = { println("Clicked Standard Button") }, modifier = textFieldModifier) {
+            Text("Submit")
+        }
+
+
     }
 
 }
