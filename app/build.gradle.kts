@@ -7,14 +7,14 @@ android {
     namespace = "com.example.healthybet"
     compileSdk {
         version = release(37) {
-            minorApiLevel = 2
+            minorApiLevel = 1
         }
     }
 
     defaultConfig {
         applicationId = "com.example.healthybet"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
