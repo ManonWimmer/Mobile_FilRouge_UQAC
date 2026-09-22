@@ -6,8 +6,8 @@ plugins {
 android {
     namespace = "com.example.healthybet"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
+        version = release(37) {
+            minorApiLevel = 2
         }
     }
 
