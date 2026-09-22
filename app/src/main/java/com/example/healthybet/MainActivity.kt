@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.healthybet.screens.ConnexionScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             HealthyBetTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Header(
+                    ConnexionScreen(
                         name = "Healthy Bet",
                         modifier = Modifier.padding(innerPadding).fillMaxWidth().background(Color.DarkGray)
                     )
@@ -78,42 +79,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Header(name: String, modifier: Modifier = Modifier) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-
-        val textModifier = Modifier.padding(PaddingValues(30.dp));
-
-        Text(text = name, color= Color.White, modifier=textModifier, textAlign = TextAlign.Center);
-
-        val imageModifier = Modifier.size(150.dp).padding(PaddingValues(10.dp));
-
-        Image(painterResource(
-            id=R.drawable.cat),
-            contentDescription = "cat",
-            modifier = imageModifier
-        );
-
-        val textFieldModifier = Modifier.padding(PaddingValues( 5.dp))
-
-        TextField(
-            state = rememberTextFieldState(),
-            placeholder = { Text("Enter Username") },
-            modifier = textFieldModifier
-        )
-        TextField(
-            state = rememberTextFieldState(),
-            placeholder = { Text("Enter Password") },
-            modifier = textFieldModifier
-        )
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HeaderPreview() {
-    HealthyBetTheme {
-        Header("Healthy Bet")
-    }
-}
