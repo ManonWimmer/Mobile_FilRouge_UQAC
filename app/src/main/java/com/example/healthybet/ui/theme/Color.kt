@@ -15,3 +15,5 @@ val FieldBg = Color(0xFF1B2130)
 val GreenAccent = Color(0xFF29CE83)
 val GraySubtitle = Color(0xFF9AA0AC)
 val GrayLabel = Color(0xFFC5C9D1)
+
+val DarkBlue = Color(0xFF0B0E16)

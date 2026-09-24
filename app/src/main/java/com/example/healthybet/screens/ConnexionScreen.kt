@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -39,6 +41,10 @@ import com.example.healthybet.ui.theme.GrayLabel
 import com.example.healthybet.ui.theme.GraySubtitle
 import com.example.healthybet.ui.theme.HealthyBetTheme
 import com.example.healthybet.ui.theme.GreenAccent
+import com.example.healthybet.ui.theme.DarkBlue
+import com.example.healthybet.ui.theme.LittleRoundedCornerShape
+import com.example.healthybet.ui.theme.MediumRoundedCornerShape
+import com.example.healthybet.ui.theme.HighRoundedCornerShape
 
 @Composable
 fun ConnexionScreen(modifier: Modifier = Modifier) {
@@ -53,13 +59,13 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
-        Column(modifier = Modifier.fillMaxWidth().align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.widthIn(min = 400.dp, max = 600.dp).align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
 
             // Logo
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(GreenAccent, RoundedCornerShape(18.dp)), // todo: use shape
+                    .background(GreenAccent, MediumRoundedCornerShape),
                 contentAlignment = Alignment.Center
             ) {
                 Image(painterResource(
@@ -74,9 +80,8 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             // App name
             Text(
                 text = "Healthy Bet",
-                color = Color.White, // todo: use color
-                fontSize = 20.sp, // todo : use type
-                fontWeight = FontWeight.Bold
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -84,9 +89,8 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             // Text 1
             Text(
                 text = "Ravis de te revoir !",
-                color = Color.White, // todo: use color
-                fontSize = 26.sp, // todo: use type
-                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
 
@@ -108,7 +112,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
                     value = email,
                     onValueChange = { email = it },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp), // todo: use shape
+                    shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
                     placeholder = { Text("jean.dupont@gmail.com") }
@@ -123,7 +127,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
                     value = password,
                     onValueChange = { password = it },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp), // todo: use shape
+                    shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
                     placeholder = { Text("fitnesspro123") }
@@ -136,11 +140,8 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             Text( // todo: on click
                 text = "Mot de passe oublié ?",
                 color = GreenAccent,
-                fontSize = 13.sp, //todo: use type
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 4.dp),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
                 textAlign = TextAlign.End
             )
 
@@ -149,28 +150,17 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             // Se connecter
             Button(
                 onClick = { /* todo */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(16.dp), // todo: use shape
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = GreenAccent
-                )
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = LittleRoundedCornerShape,
+                colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
             ) {
                 Text(
                     text = "Se connecter",
-                    color = Color(0xFF0B0E16), // todo: use color
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp // todo : use type
+                    style = MaterialTheme.typography.labelLarge
                 )
             }
-
-
         }
     }
-
-
-
 }
 
 @Preview(showBackground = true)
@@ -184,7 +174,7 @@ fun ConnexionScreenPreview() {
 @Composable
 private fun LabeledField(label: String, content: @Composable () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = label, color = GrayLabel, fontSize = 13.sp) // todo: use type
+        Text(text = label, color = GrayLabel, style = MaterialTheme.typography.labelMedium);
         Spacer(modifier = Modifier.height(6.dp))
         content()
     }
