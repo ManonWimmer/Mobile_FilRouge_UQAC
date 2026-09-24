@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.healthybet.items.BottomNavBar
 import com.example.healthybet.items.BottomNavItem
 import com.example.healthybet.screens.ConnexionScreen
+import com.example.healthybet.screens.HomeScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
 import com.example.healthybet.ui.theme.BgColor
 
@@ -38,11 +39,16 @@ class MainActivity : ComponentActivity() {
                     )
                 }) { innerPadding ->
 
-                    // todo: change screen depending on nav bar item selected
+                    when(selectedTab)
+                    {
+                        // Accueil
+                        BottomNavItem.Accueil -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
 
-                    ConnexionScreen(
-                        modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor),
-                    )
+                        else -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
+                    }
+
+                    // Connexion (tablet tested)
+                    //ConnexionScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
                 }
             }
         }

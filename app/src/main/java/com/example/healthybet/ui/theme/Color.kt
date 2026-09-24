@@ -17,3 +17,5 @@ val GraySubtitle = Color(0xFF9AA0AC)
 val GrayLabel = Color(0xFFC5C9D1)
 
 val DarkBlue = Color(0xFF0B0E16)
+
+val RedFail = Color(0xFFE05C5C)
