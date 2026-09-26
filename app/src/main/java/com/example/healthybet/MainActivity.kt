@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.healthybet.items.BottomNavBar
 import com.example.healthybet.items.BottomNavItem
+import com.example.healthybet.screens.AlarmsScreen
 import com.example.healthybet.screens.ConnexionScreen
 import com.example.healthybet.screens.HomeScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HealthyBetTheme {
-                var selectedTab by remember { mutableStateOf(BottomNavItem.Accueil) }
+                var selectedTab by remember { mutableStateOf(BottomNavItem.Home) }
 
                 Scaffold(modifier = Modifier.fillMaxSize(), containerColor = BgColor, bottomBar = {
                     BottomNavBar(
@@ -41,8 +42,11 @@ class MainActivity : ComponentActivity() {
 
                     when(selectedTab)
                     {
-                        // Accueil
-                        BottomNavItem.Accueil -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
+                        // Home (tablet tested)
+                        BottomNavItem.Home -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
+
+                        // Alarms
+                        BottomNavItem.Alarms -> AlarmsScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
 
                         else -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
                     }

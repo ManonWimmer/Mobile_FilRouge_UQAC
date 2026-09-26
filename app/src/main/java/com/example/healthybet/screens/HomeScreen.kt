@@ -108,6 +108,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(20.dp))
 
         // Réveil de demain
+        // todo: utiliser code de alarms screen
         Box(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).border(1.dp, GreenAccent, HighRoundedCornerShape).padding(20.dp)) {
             Column {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -145,8 +146,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 Text(
                     text = "06:30",
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.displaySmall
+                    style = MaterialTheme.typography.displayMedium
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))

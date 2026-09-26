@@ -22,10 +22,10 @@ import com.example.healthybet.ui.theme.GraySubtitle
 import com.example.healthybet.ui.theme.FieldBg
 
 enum class BottomNavItem(val label: String, val iconSelected: ImageVector, val iconUnselected: ImageVector){
-    Accueil("Accueil", Icons.Filled.Home, Icons.Outlined.Home),
-    Reveils("Réveils", Icons.Filled.WatchLater, Icons.Outlined.WatchLater),
-    Groupes("Groupes", Icons.Filled.Groups, Icons.Outlined.Groups),
-    Profil("Profil", Icons.Filled.Person, Icons.Outlined.Person)
+    Home("Accueil", Icons.Filled.Home, Icons.Outlined.Home),
+    Alarms("Réveils", Icons.Filled.WatchLater, Icons.Outlined.WatchLater),
+    Groups("Groupes", Icons.Filled.Groups, Icons.Outlined.Groups),
+    Profile("Profil", Icons.Filled.Person, Icons.Outlined.Person)
 }
 
 @Composable
