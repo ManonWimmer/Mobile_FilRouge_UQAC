@@ -21,6 +21,7 @@ import com.example.healthybet.items.BottomNavItem
 import com.example.healthybet.screens.AlarmsScreen
 import com.example.healthybet.screens.ConnexionScreen
 import com.example.healthybet.screens.HomeScreen
+import com.example.healthybet.screens.WelcomeScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
 import com.example.healthybet.ui.theme.BgColor
 
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }) { innerPadding ->
 
+                    /*
                     when(selectedTab)
                     {
                         // Home (tablet tested)
@@ -51,8 +53,11 @@ class MainActivity : ComponentActivity() {
                         else -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
                     }
 
+                    */
+
                     // Connexion (tablet tested)
-                    //ConnexionScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
+                    //WelcomeScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
