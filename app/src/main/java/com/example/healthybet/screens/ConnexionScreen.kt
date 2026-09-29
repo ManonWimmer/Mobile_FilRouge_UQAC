@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthybet.R
 import com.example.healthybet.ui.theme.FieldBg
 import com.example.healthybet.ui.theme.GrayLabel
@@ -49,8 +50,7 @@ import com.example.healthybet.ui.theme.HighRoundedCornerShape
 @Composable
 fun ConnexionScreen(modifier: Modifier = Modifier) {
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val viewModel : ConnexionViewModel = viewModel()
     var passwordVisible by remember { mutableStateOf(false) }
 
 
@@ -109,8 +109,8 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             // Email
             LabeledField(label = "Adresse Email") {
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = viewModel.email,
+                    onValueChange = { viewModel.email = it },
                     modifier = Modifier.fillMaxWidth(),
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
@@ -124,8 +124,8 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
             // Mot de passe
             LabeledField(label = "Mot de passe") {
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = viewModel.password,
+                    onValueChange = { viewModel.password = it },
                     modifier = Modifier.fillMaxWidth(),
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),

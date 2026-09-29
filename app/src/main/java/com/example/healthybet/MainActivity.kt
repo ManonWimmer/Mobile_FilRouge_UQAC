@@ -52,8 +52,9 @@ class MainActivity : ComponentActivity() {
 
                         else -> HomeScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor))
                     }
-
                     */
+
+
 
                     // Connexion (tablet tested)
                     //WelcomeScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
