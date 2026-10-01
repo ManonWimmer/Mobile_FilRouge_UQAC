@@ -20,6 +20,7 @@ import com.example.healthybet.items.BottomNavBar
 import com.example.healthybet.items.BottomNavItem
 import com.example.healthybet.screens.AlarmsScreen
 import com.example.healthybet.screens.ConnexionScreen
+import com.example.healthybet.screens.CreateAlarmScreen
 import com.example.healthybet.screens.HomeScreen
 import com.example.healthybet.screens.WelcomeScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
@@ -54,11 +55,14 @@ class MainActivity : ComponentActivity() {
                     }
                     */
 
+                    // Test create alarm
+                    CreateAlarmScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor), {/* to do */});
+
 
 
                     // Connexion (tablet tested)
                     //WelcomeScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
-                    AppNavigation(modifier = Modifier.padding(innerPadding))
+                    //AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
