@@ -56,13 +56,13 @@ class MainActivity : ComponentActivity() {
                     */
 
                     // Test create alarm
-                    CreateAlarmScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor), {/* to do */});
+                    //CreateAlarmScreen(modifier = Modifier.padding(innerPadding).fillMaxSize().background(BgColor), {/* to do */});
 
 
 
                     // Connexion (tablet tested)
                     //WelcomeScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
-                    //AppNavigation(modifier = Modifier.padding(innerPadding))
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

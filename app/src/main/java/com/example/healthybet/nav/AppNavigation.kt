@@ -6,12 +6,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.healthybet.screens.ConnexionScreen
+import com.example.healthybet.screens.HomeScreen
+import com.example.healthybet.screens.SignUpScreen
 import com.example.healthybet.screens.WelcomeScreen
 
 object Routes {
     const val WELCOME = "welcome"
     const val SIGNUP = "signup"
     const val LOGIN = "login"
+    const val HOME = "home"
 }
 
 @Composable
@@ -31,11 +34,19 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
 
         composable(Routes.SIGNUP) {
-            ConnexionScreen()
+            SignUpScreen(
+                onAccountCreationClick = { navController.navigate(Routes.HOME)}
+            )
         }
 
         composable(Routes.LOGIN) {
-            ConnexionScreen()
+            ConnexionScreen(
+                onConnexionClick = { navController.navigate(Routes.HOME)}
+            )
+        }
+
+        composable(Routes.HOME ) {
+            HomeScreen()
         }
     }
 }
