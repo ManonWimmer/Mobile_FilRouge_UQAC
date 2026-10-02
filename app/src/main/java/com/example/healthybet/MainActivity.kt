@@ -16,6 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.healthybet.items.BottomNavBar
 import com.example.healthybet.items.BottomNavItem
 import com.example.healthybet.screens.AlarmsScreen
@@ -33,6 +35,51 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HealthyBetTheme {
+                val navController = rememberNavController()
+                val backStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = backStackEntry?.destination?.route
+
+                // Affichge pas la bottom barre
+                val bottomBarNotRoutes = listOf(Routes.WELCOME, Routes.SIGNUP, Routes.LOGIN)
+                val dontShowBottomBar = currentRoute in bottomBarNotRoutes
+
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = BgColor,
+                    bottomBar = {
+                        //Scaffold - Bottom barre conditionnelle
+                        if (!dontShowBottomBar) {
+                            BottomNavBar(
+
+                                // Change le logo selon la fenetre so far pas besoin de plus
+                                selected = when (currentRoute) {
+                                    Routes.ALARM -> BottomNavItem.Alarms
+                                    else -> BottomNavItem.Home
+                                },
+                                onItemSelected = { item ->
+                                    val route = when (item) {
+                                        BottomNavItem.Alarms -> Routes.ALARM
+                                        else -> Routes.HOME
+                                    }
+                                    navController.navigate(route) {
+                                        popUpTo(Routes.HOME) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    AppNavigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+
+
+                /*
                 var selectedTab by remember { mutableStateOf(BottomNavItem.Home) }
 
                 Scaffold(modifier = Modifier.fillMaxSize(), containerColor = BgColor, bottomBar = {
@@ -64,6 +111,8 @@ class MainActivity : ComponentActivity() {
                     //WelcomeScreen(modifier = Modifier.padding(PaddingValues(0.dp)).fillMaxSize().background(BgColor))
                     AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
+
+                 */
             }
         }
     }
