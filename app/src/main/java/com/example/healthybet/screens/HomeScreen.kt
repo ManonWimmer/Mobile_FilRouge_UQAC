@@ -52,7 +52,8 @@ data class FriendBet(
 )
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier = Modifier,
+               onCreateAlarmClick : () -> Unit = {}) {
 
     // todo: use profile values
     val userName = "Alexis"
@@ -201,7 +202,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
         // Button add réveil
         Button(
-            onClick = { /* todo */ },
+            onClick = onCreateAlarmClick,
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = LittleRoundedCornerShape,
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)

@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.healthybet.screens.ConnexionScreen
+import com.example.healthybet.screens.CreateAlarmScreen
 import com.example.healthybet.screens.HomeScreen
 import com.example.healthybet.screens.SignUpScreen
 import com.example.healthybet.screens.WelcomeScreen
@@ -15,6 +16,8 @@ object Routes {
     const val SIGNUP = "signup"
     const val LOGIN = "login"
     const val HOME = "home"
+
+    const val CREATEALARM = "create_alarm"
 }
 
 @Composable
@@ -46,7 +49,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
 
         composable(Routes.HOME ) {
-            HomeScreen()
+            HomeScreen(
+                onCreateAlarmClick = { navController.navigate(Routes.CREATEALARM)}
+            )
+        }
+
+        composable(Routes.CREATEALARM){
+            CreateAlarmScreen()
         }
     }
 }
