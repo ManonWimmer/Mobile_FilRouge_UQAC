@@ -48,7 +48,8 @@ import com.example.healthybet.ui.theme.MediumRoundedCornerShape
 import com.example.healthybet.ui.theme.HighRoundedCornerShape
 
 @Composable
-fun ConnexionScreen(modifier: Modifier = Modifier) {
+fun ConnexionScreen(modifier: Modifier = Modifier,
+                    onConnexionClick : () -> Unit = {}) {
 
     val viewModel : ConnexionViewModel = viewModel()
     var passwordVisible by remember { mutableStateOf(false) }
@@ -149,7 +150,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier) {
 
             // Se connecter
             Button(
-                onClick = { /* todo */ },
+                onClick = onConnexionClick,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = LittleRoundedCornerShape,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
