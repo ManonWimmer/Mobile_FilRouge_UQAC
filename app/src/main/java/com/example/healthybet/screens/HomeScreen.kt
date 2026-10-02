@@ -2,6 +2,7 @@ package com.example.healthybet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,7 +54,8 @@ data class FriendBet(
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier,
-               onCreateAlarmClick : () -> Unit = {}) {
+               onCreateAlarmClick : () -> Unit = {},
+               onSelectAlarmScreen : () -> Unit = {}) {
 
     // todo: use profile values
     val userName = "Alexis"
@@ -110,7 +112,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
         // Réveil de demain
         // todo: utiliser code de alarms screen
-        Box(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).border(1.dp, GreenAccent, HighRoundedCornerShape).padding(20.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).clickable(onClick = onSelectAlarmScreen).border(1.dp, GreenAccent, HighRoundedCornerShape).padding(20.dp)) {
             Column {
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     // Icon réveil
@@ -139,6 +141,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
+                    //TODO BUTTON SWAP DE SCREEN
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
