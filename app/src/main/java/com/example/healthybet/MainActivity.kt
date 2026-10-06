@@ -24,6 +24,7 @@ import com.example.healthybet.screens.AlarmsScreen
 import com.example.healthybet.screens.ConnexionScreen
 import com.example.healthybet.screens.CreateAlarmScreen
 import com.example.healthybet.screens.HomeScreen
+import com.example.healthybet.screens.SettingsScreen
 import com.example.healthybet.screens.WelcomeScreen
 import com.example.healthybet.ui.theme.HealthyBetTheme
 import com.example.healthybet.ui.theme.BgColor
@@ -72,10 +73,16 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
+                    // Test settings data store
+                    SettingsScreen(Modifier.padding(innerPadding));
+
+                    /*
                     AppNavigation(
                         navController = navController,
                         modifier = Modifier.padding(innerPadding)
                     )
+                    */
+
                 }
 
 
