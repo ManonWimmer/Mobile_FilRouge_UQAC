@@ -1,4 +1,4 @@
-package com.example.healthybet.items
+package com.grman.healthybet.items
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons
@@ -17,9 +17,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.healthybet.ui.theme.GreenAccent
-import com.example.healthybet.ui.theme.GraySubtitle
-import com.example.healthybet.ui.theme.FieldBg
+import com.grman.healthybet.ui.theme.GreenAccent
+import com.grman.healthybet.ui.theme.GraySubtitle
+import com.grman.healthybet.ui.theme.FieldBg
 
 enum class BottomNavItem(val label: String, val iconSelected: ImageVector, val iconUnselected: ImageVector){
     Home("Accueil", Icons.Filled.Home, Icons.Outlined.Home),

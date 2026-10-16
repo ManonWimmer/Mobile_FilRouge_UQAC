@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.healthybet"
+    namespace = "com.grman.healthybet"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.healthybet"
+        applicationId = "com.grman.healthybet"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

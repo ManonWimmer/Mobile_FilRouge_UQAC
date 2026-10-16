@@ -1,4 +1,4 @@
-package com.example.healthybet.screens
+package com.grman.healthybet.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,14 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthybet.ui.theme.FieldBg
-import com.example.healthybet.ui.theme.GraySubtitle
-import com.example.healthybet.ui.theme.GreenAccent
-import com.example.healthybet.ui.theme.HealthyBetTheme
-import com.example.healthybet.ui.theme.HighRoundedCornerShape
-import com.example.healthybet.ui.theme.LittleRoundedCornerShape
-import com.example.healthybet.ui.theme.MediumRoundedCornerShape
-import com.example.healthybet.ui.theme.RedFail
+import com.grman.healthybet.ui.theme.FieldBg
+import com.grman.healthybet.ui.theme.GraySubtitle
+import com.grman.healthybet.ui.theme.GreenAccent
+import com.grman.healthybet.ui.theme.HealthyBetTheme
+import com.grman.healthybet.ui.theme.HighRoundedCornerShape
+import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
+import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
+import com.grman.healthybet.ui.theme.RedFail
 
 data class Alarm(
     val time: String, // todo: use profile image, values etc

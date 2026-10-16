@@ -1,16 +1,16 @@
-package com.example.healthybet
+package com.grman.healthybet
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.healthybet.screens.AlarmsScreen
-import com.example.healthybet.screens.ConnexionScreen
-import com.example.healthybet.screens.CreateAlarmScreen
-import com.example.healthybet.screens.HomeScreen
-import com.example.healthybet.screens.SignUpScreen
-import com.example.healthybet.screens.WelcomeScreen
+import com.grman.healthybet.screens.AlarmsScreen
+import com.grman.healthybet.screens.ConnexionScreen
+import com.grman.healthybet.screens.CreateAlarmScreen
+import com.grman.healthybet.screens.HomeScreen
+import com.grman.healthybet.screens.SignUpScreen
+import com.grman.healthybet.screens.WelcomeScreen
 
 object Routes {
     const val WELCOME = "welcome"

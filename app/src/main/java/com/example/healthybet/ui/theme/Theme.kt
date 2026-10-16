@@ -1,4 +1,4 @@
-package com.example.healthybet.ui.theme
+package com.grman.healthybet.ui.theme
 
 import android.app.Activity
 import android.os.Build

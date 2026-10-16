@@ -1,4 +1,4 @@
-package com.example.healthybet.screens
+package com.grman.healthybet.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -41,12 +41,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.healthybet.R
-import com.example.healthybet.ui.theme.GraySubtitle
-import com.example.healthybet.ui.theme.GreenAccent
-import com.example.healthybet.ui.theme.HealthyBetTheme
-import com.example.healthybet.ui.theme.LittleRoundedCornerShape
-import com.example.healthybet.ui.theme.MediumRoundedCornerShape
+import com.grman.healthybet.R
+import com.grman.healthybet.ui.theme.GraySubtitle
+import com.grman.healthybet.ui.theme.GreenAccent
+import com.grman.healthybet.ui.theme.HealthyBetTheme
+import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
+import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 

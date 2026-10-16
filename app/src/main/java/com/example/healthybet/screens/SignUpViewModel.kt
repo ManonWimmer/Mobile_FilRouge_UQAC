@@ -1,4 +1,4 @@
-package com.example.healthybet.screens
+package com.grman.healthybet.screens
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

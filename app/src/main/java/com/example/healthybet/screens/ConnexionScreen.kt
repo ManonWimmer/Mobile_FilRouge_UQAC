@@ -1,4 +1,4 @@
-package com.example.healthybet.screens
+package com.grman.healthybet.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,16 +36,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.healthybet.R
-import com.example.healthybet.ui.theme.FieldBg
-import com.example.healthybet.ui.theme.GrayLabel
-import com.example.healthybet.ui.theme.GraySubtitle
-import com.example.healthybet.ui.theme.HealthyBetTheme
-import com.example.healthybet.ui.theme.GreenAccent
-import com.example.healthybet.ui.theme.DarkBlue
-import com.example.healthybet.ui.theme.LittleRoundedCornerShape
-import com.example.healthybet.ui.theme.MediumRoundedCornerShape
-import com.example.healthybet.ui.theme.HighRoundedCornerShape
+import com.grman.healthybet.R
+import com.grman.healthybet.ui.theme.FieldBg
+import com.grman.healthybet.ui.theme.GrayLabel
+import com.grman.healthybet.ui.theme.GraySubtitle
+import com.grman.healthybet.ui.theme.HealthyBetTheme
+import com.grman.healthybet.ui.theme.GreenAccent
+import com.grman.healthybet.ui.theme.DarkBlue
+import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
+import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
+import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 
 @Composable
 fun ConnexionScreen(modifier: Modifier = Modifier,
@@ -70,7 +70,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                 contentAlignment = Alignment.Center
             ) {
                 Image(painterResource(
-                    id=R.drawable.cat),
+                    id= R.drawable.cat),
                     contentDescription = "cat", // todo: change
                     modifier = Modifier.size(20.dp)
                 );
