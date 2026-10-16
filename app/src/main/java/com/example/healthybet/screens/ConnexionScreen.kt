@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -31,6 +33,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -131,7 +135,9 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("fitnesspro123") }
+                    placeholder = { Text("fitnesspro123") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
             }
 
@@ -148,17 +154,25 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // Msg d'erreur
+            viewModel.errorMessage?.let {
+                Text(text = it, color = Color(0xFFFF6B6B), fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             // Se connecter
             Button(
-                onClick = onConnexionClick,
+                onClick = { viewModel.signIn(onSuccess = onConnexionClick) },
+                enabled = !viewModel.isLoading,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = LittleRoundedCornerShape,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
             ) {
-                Text(
-                    text = "Se connecter",
-                    style = MaterialTheme.typography.labelLarge
-                )
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Text("Se connecter", style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
     }
