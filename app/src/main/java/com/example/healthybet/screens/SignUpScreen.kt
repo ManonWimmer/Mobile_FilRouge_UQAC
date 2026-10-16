@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -22,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -133,41 +137,49 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("fitnesspro123") }
+                    placeholder = { Text("fitnesspro123") },
+                   visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
-            //TODO feature same or not
-            // Confirmer le Mot de passe
             LabeledField(label = "Confirmer le mot de passe") {
                 OutlinedTextField(
-                    value = viewModel.password,
-                    onValueChange = { viewModel.password = it },
+                    value = viewModel.confirmPassword,
+                    onValueChange = { viewModel.confirmPassword = it },
                     modifier = Modifier.fillMaxWidth(),
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("répète ton mot de passe") }
+                    placeholder = { Text("répète ton mot de passe") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            //TODO Sauvegarde + validate
+            // Message d'erreur sign up
+            viewModel.errorMessage?.let {
+                Text(text = it, color = Color(0xFFFF6B6B), fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             // S'inscrire
             Button(
-                onClick = onAccountCreationClick,
+                onClick = { viewModel.signUp(onSuccess = onAccountCreationClick) },
+                enabled = !viewModel.isLoading,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = LittleRoundedCornerShape,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
             ) {
-                Text(
-                    text = "Créer mon compte",
-                    style = MaterialTheme.typography.labelLarge
-                )
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                } else {
+                    Text("Créer mon compte", style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
     }

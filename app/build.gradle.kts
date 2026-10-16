@@ -60,6 +60,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation("com.google.firebase:firebase-auth")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
-    implementation(platform("com.google.firebase:firebase-bom:35.0.1"))
 }

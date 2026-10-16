@@ -43,7 +43,7 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
-
+import com.google.firebase.auth.FirebaseAuth
 
 data class FriendBet(
     val emoji: String, // todo: use profile image, values etc
@@ -57,8 +57,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
                onCreateAlarmClick : () -> Unit = {},
                onSelectAlarmScreen : () -> Unit = {}) {
 
-    // todo: use profile values
-    val userName = "Alexis"
+    val userName = FirebaseAuth.getInstance().currentUser?.displayName ?: "Username introuvable"
     val streakDays = 5
     val friendBets = listOf(
         FriendBet("😐", "Sarah J.", "Y ARRIVERA (+100 pts)", success = true),
