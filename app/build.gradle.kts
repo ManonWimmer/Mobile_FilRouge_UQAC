@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -60,4 +61,5 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation(platform("com.google.firebase:firebase-bom:35.0.1"))
 }
