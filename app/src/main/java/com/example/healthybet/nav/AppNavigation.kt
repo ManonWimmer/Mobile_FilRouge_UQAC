@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import com.grman.healthybet.screens.AlarmsScreen
 import com.grman.healthybet.screens.ConnexionScreen
 import com.grman.healthybet.screens.CreateAlarmScreen
+import com.grman.healthybet.screens.CreateGroupScreen
+import com.grman.healthybet.screens.GroupsScreen
 import com.grman.healthybet.screens.HomeScreen
 import com.grman.healthybet.screens.SignUpScreen
 import com.grman.healthybet.screens.WelcomeScreen
@@ -19,6 +21,7 @@ object Routes {
     const val HOME = "home"
     const val CREATE_ALARM = "create_alarm"
     const val ALARM = "alarm"
+    const val GROUPS = "groups"
 }
 
 @Composable
@@ -63,6 +66,10 @@ fun AppNavigation(modifier: Modifier = Modifier,
 
         composable (Routes.ALARM) {
             AlarmsScreen()
+        }
+
+        composable(Routes.GROUPS) {
+            GroupsScreen(onCreateGroupClick = { /* to do : create groupe */ })
         }
     }
 }
