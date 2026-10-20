@@ -50,10 +50,10 @@ import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 @Composable
 fun GroupsScreen(
     modifier: Modifier = Modifier,
+    viewModel: GroupsViewModel,
     onCreateGroupClick: () -> Unit = {},
     onGroupClick: (String) -> Unit = {}
 ) {
-    val viewModel : GroupsViewModel = viewModel()
 
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -208,6 +208,6 @@ private fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Mo
 @Composable
 fun GroupsScreenPreview() {
     HealthyBetTheme {
-        GroupsScreen()
+        GroupsScreen(viewModel = GroupsViewModel())
     }
 }
