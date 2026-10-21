@@ -6,56 +6,78 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 data class Group(
-    val id: String,
-    val name: String,
+    @DocumentId val id: String = "",   // id du document rempli automatiquement
+    val name: String = "",
     val emoji: String = "",
     val description: String = "",
-    val memberCount: Int, // todo: membres donc count à recup
-    val memberEmojis: List<String> = emptyList(), // todo: photos de profil des membres
-    val joined: Boolean = false
-)
+    val ownerId: String = "",
+    val members: List<String> = emptyList() // uid des membres
+) {
+    val memberCount: Int get() = members.size
+
+    val memberEmojis: List<String> get() = members.take(3).map { "😄" } // todo: photos de profil via la collection "members"
+}
+
 
 class GroupsViewModel : ViewModel() {
 
-    // todo : bdd
-    val myGroups = mutableStateListOf(
-        Group("1", "Les runners", "🏃", "", 12, listOf("😎", "😆", "😎"), joined = true),
-        Group("2", "Potes UQAC", "", "", 8, listOf("😎", "🥱", "🙂"), joined = true),
-        Group("3", "Hyrox 6AM Club", "", "", 15, listOf("😆", "😎", "🤔"), joined = true),
-    )
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance();
+    private val uid: String? get() = auth.currentUser?.uid
 
-    // todo: bdd
-    val discoverGroups = mutableStateListOf(
-        Group("10", "Lève-tôt Saguenay", "🌅", "Réveil avant 6h, on se motive entre nous", 42, memberEmojis = listOf("😎", "🥱")),
-        Group("11", "Marathon 2026", "🏅", "Préparation marathon, objectifs de course", 27),
-        Group("12", "CrossFit UQAC", "🏋️", "Les gars et filles du box", 19),
-        Group("13", "10 000 pas/jour", "👟", "Défi quotidien de marche", 64),
-    )
+    val myGroups = mutableStateListOf<Group>()
+    val discoverGroups = mutableStateListOf<Group>()
 
     var searchQuery by mutableStateOf("")
-
-    // todo: bdd
-    val filteredDiscover: List<Group>
-        get() = discoverGroups.filter {
-            !it.joined && (searchQuery.isBlank() || it.name.contains(searchQuery.trim(), ignoreCase = true))
-        }
-
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
 
-    private val auth = FirebaseAuth.getInstance() // pour plus tard au moins c fait
+    // Recherche: filtre simplement sur le nom (un texte vide garde tous les groupes)
+    val filteredDiscover: List<Group>
+        get() = discoverGroups.filter { it.name.contains(searchQuery.trim(), ignoreCase = true) }
+
+
+    // Charge les groupes depuis Firestore et les range dans myGroups ou discoverGroups
+    fun loadGroups() {
+        // Check id
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            errorMessage = "Utilisateur non connecté"
+            return
+        }
+
+        db.collection("groups").get()
+            .addOnSuccessListener { result ->
+                myGroups.clear()
+                discoverGroups.clear()
+
+                for (group in result.toObjects(Group::class.java)) {
+                    // User id -> my groups
+                    if (uid in group.members) {
+                        myGroups.add(group)
+                    } else { // Else -> discover groups
+                        discoverGroups.add(group)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                errorMessage = e.message ?: "Erreur de chargement des groupes"
+            }
+    }
+
 
     fun createGroup(name: String, emoji: String, description: String, onSuccess: () -> Unit) {
-
-        // Nom vide
         if (name.isBlank()) {
             errorMessage = "Le nom du groupe est vide"
             return
         }
 
-        // User id null
         val uid = auth.currentUser?.uid
         if (uid == null) {
             errorMessage = "Utilisateur non connecté"
@@ -65,38 +87,37 @@ class GroupsViewModel : ViewModel() {
         isLoading = true
         errorMessage = null
 
-        // todo: bdd
-        myGroups.add(
-            0,
-            Group(
-                id = System.currentTimeMillis().toString(), // id avec time millis
-                name = name.trim(),
-                emoji = emoji,
-                description = description.trim(),
-                memberCount = 1,
-                memberEmojis = listOf("😄"), // todo: member profile pictures ou members id
-                joined = true
-            )
+        // New groupe avec 1 membre le user
+        val group = hashMapOf(
+            "name" to name.trim(),
+            "emoji" to emoji,
+            "description" to description.trim(),
+            "ownerId" to uid,
+            "members" to listOf(uid)
         )
 
-        isLoading = false
-        onSuccess()
+        db.collection("groups").add(group)
+            .addOnSuccessListener {
+                isLoading = false
+                loadGroups()
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                isLoading = false
+                errorMessage = e.message ?: "Erreur de création du groupe"
+            }
     }
 
     fun joinGroup(groupId: String) {
-        // todo Firestore: update(groupId, "members", FieldValue.arrayUnion(uid), "memberCount", FieldValue.increment(1))
+        // Check uid
+        val uid = auth.currentUser?.uid ?: return
 
-        // Get index in discover groups
-        val index = discoverGroups.indexOfFirst { it.id == groupId }
-
-        if (index == -1)
-            return
-
-        // Get group from discover groups
-        val group = discoverGroups[index].copy(joined = true)
-
-        // Update group
-        discoverGroups[index] = group
-        myGroups.add(group)
+        // Add id to members from group
+        db.collection("groups").document(groupId)
+            .update("members", FieldValue.arrayUnion(uid))
+            .addOnSuccessListener { loadGroups() }
+            .addOnFailureListener { e ->
+                errorMessage = e.message ?: "Impossible de rejoindre le groupe"
+            }
     }
 }

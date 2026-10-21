@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,9 @@ fun GroupsScreen(
     onCreateGroupClick: () -> Unit = {},
     onGroupClick: (String) -> Unit = {}
 ) {
+
+    // Launched effect -> à chaque fois que le composable apparait à l'écran
+    LaunchedEffect(Unit) { viewModel.loadGroups() } // Update affichage groups
 
     var selectedTab by remember { mutableIntStateOf(0) }
 
