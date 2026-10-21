@@ -30,6 +30,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,9 +49,10 @@ import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 data class FriendBet(
-    val emoji: String, // todo: use profile image, values etc
+    val emoji: String,
     val name: String,
     val prediction: String,
     val success: Boolean
@@ -57,7 +63,19 @@ fun HomeScreen(modifier: Modifier = Modifier,
                onCreateAlarmClick : () -> Unit = {},
                onSelectAlarmScreen : () -> Unit = {}) {
 
-    val userName = FirebaseAuth.getInstance().currentUser?.displayName ?: "Username introuvable"
+    val user = FirebaseAuth.getInstance().currentUser
+    val userName = user?.displayName ?: "Username introuvable"
+    var emoji by remember { mutableStateOf("😄") } // par défaut
+
+    // Get emoji
+    LaunchedEffect(Unit) {
+        val uid = user?.uid ?: return@LaunchedEffect
+        FirebaseFirestore.getInstance().collection("members").document(uid).get()
+            .addOnSuccessListener { doc ->
+                emoji = doc.getString("emoji") ?: "😄"
+            }
+    }
+
     val streakDays = 5
     val friendBets = listOf(
         FriendBet("😐", "Sarah J.", "Y ARRIVERA (+100 pts)", success = true),
@@ -69,9 +87,9 @@ fun HomeScreen(modifier: Modifier = Modifier,
         // Header
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 
-            // Profile icon (todo: use profile image)
+            // Profile icon
             Box(modifier = Modifier.size(44.dp).background(GreenAccent, CircleShape), contentAlignment = Alignment.Center) {
-                Text(text = "😄", style = MaterialTheme.typography.bodyLarge)
+                Text(text = emoji, style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.width(12.dp))

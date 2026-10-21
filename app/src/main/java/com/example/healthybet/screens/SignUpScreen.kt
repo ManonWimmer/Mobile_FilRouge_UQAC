@@ -2,8 +2,12 @@ package com.grman.healthybet.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +24,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +47,8 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
+
+private val memberEmojis = listOf("\uD83D\uDE00", "\uD83D\uDE01️", "☺\uFE0F", "\uD83D\uDE07", "\uD83E\uDD70", "\uD83E\uDD2A", "\uD83E\uDD78", "\uD83E\uDEE1", "\uD83D\uDE0E", "\uD83D\uDE0B") // emojis à choisiri
 
 @Composable
 fun SignUpScreen(modifier: Modifier = Modifier,
@@ -97,6 +107,29 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             )
 
             Spacer(modifier = Modifier.height(28.dp))
+
+            // Emojis (comme dans create group)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                memberEmojis.forEach { item ->
+                    val selected = item == viewModel.emoji
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(if (selected) GreenAccent.copy(alpha = 0.15f) else FieldBg, MediumRoundedCornerShape)
+                            .border(
+                                1.dp,
+                                if (selected) GreenAccent else Color.White.copy(alpha = 0.1f),
+                                MediumRoundedCornerShape
+                            )
+                            .clickable { viewModel.emoji = item },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = item, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Pseudo
             LabeledField(label = "Pseudo") {

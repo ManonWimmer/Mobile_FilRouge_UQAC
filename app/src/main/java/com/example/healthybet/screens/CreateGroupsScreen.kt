@@ -101,6 +101,7 @@ fun CreateGroupScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        // Emojis
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             groupEmojis.forEach { item ->
                 val selected = item == emoji
