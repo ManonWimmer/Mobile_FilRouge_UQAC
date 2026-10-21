@@ -15,6 +15,7 @@ import com.grman.healthybet.screens.GroupsViewModel
 import com.grman.healthybet.screens.HomeScreen
 import com.grman.healthybet.screens.SignUpScreen
 import com.grman.healthybet.screens.WelcomeScreen
+import com.grman.healthybet.screens.GroupDetailScreen
 
 object Routes {
     const val WELCOME = "welcome"
@@ -25,6 +26,7 @@ object Routes {
     const val ALARM = "alarm"
     const val GROUPS = "groups"
     const val CREATE_GROUP = "create_group"
+    const val GROUP_DETAIL = "group_detail"
 }
 
 @Composable
@@ -75,7 +77,10 @@ fun AppNavigation(modifier: Modifier = Modifier,
         }
 
         composable(Routes.GROUPS) {
-            GroupsScreen(viewModel = groupsViewModel, onCreateGroupClick = { navController.navigate(Routes.CREATE_GROUP)  })
+            GroupsScreen(
+                viewModel = groupsViewModel,
+                onCreateGroupClick = { navController.navigate(Routes.CREATE_GROUP)  },
+                onGroupClick = { id -> navController.navigate("${Routes.GROUP_DETAIL}/$id") })
         }
 
         composable(Routes.CREATE_GROUP) {
@@ -83,6 +88,14 @@ fun AppNavigation(modifier: Modifier = Modifier,
                 viewModel = groupsViewModel,
                 onClose = { navController.popBackStack() },
                 onGroupCreated = { navController.popBackStack() }
+            )
+        }
+
+        composable("${Routes.GROUP_DETAIL}/{groupId}") { entry ->
+            GroupDetailScreen(
+                groupId = entry.arguments?.getString("groupId") ?: "",
+                viewModel = groupsViewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }
