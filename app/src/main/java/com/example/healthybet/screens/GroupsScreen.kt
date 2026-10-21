@@ -99,7 +99,11 @@ fun GroupsScreen(
                 onCreateGroupClick = onCreateGroupClick,
                 modifier = Modifier.weight(1f)
             )
-            // todo : else Search groups
+            // Search groups
+            else -> SearchGroupContent(
+                viewModel = viewModel,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
