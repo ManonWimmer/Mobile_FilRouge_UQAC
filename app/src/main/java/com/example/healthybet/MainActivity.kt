@@ -57,12 +57,14 @@ class MainActivity : ComponentActivity() {
                                 selected = when (currentRoute) {
                                     Routes.ALARM -> BottomNavItem.Alarms
                                     Routes.GROUPS -> BottomNavItem.Groups
+                                    Routes.PROFILE -> BottomNavItem.Profile
                                     else -> BottomNavItem.Home
                                 },
                                 onItemSelected = { item ->
                                     val route = when (item) {
                                         BottomNavItem.Alarms -> Routes.ALARM
                                         BottomNavItem.Groups -> Routes.GROUPS
+                                        BottomNavItem.Profile -> Routes.PROFILE
                                         else -> Routes.HOME
                                     }
                                     navController.navigate(route) {

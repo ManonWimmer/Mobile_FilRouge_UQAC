@@ -16,6 +16,7 @@ import com.grman.healthybet.screens.HomeScreen
 import com.grman.healthybet.screens.SignUpScreen
 import com.grman.healthybet.screens.WelcomeScreen
 import com.grman.healthybet.screens.GroupDetailScreen
+import com.grman.healthybet.screens.ProfileScreen
 
 object Routes {
     const val WELCOME = "welcome"
@@ -27,6 +28,7 @@ object Routes {
     const val GROUPS = "groups"
     const val CREATE_GROUP = "create_group"
     const val GROUP_DETAIL = "group_detail"
+    const val PROFILE = "profile"
 }
 
 @Composable
@@ -96,6 +98,16 @@ fun AppNavigation(modifier: Modifier = Modifier,
                 groupId = entry.arguments?.getString("groupId") ?: "",
                 viewModel = groupsViewModel,
                 onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.PROFILE) {
+            ProfileScreen(
+                onLogout = {
+                    navController.navigate(Routes.WELCOME) {
+                        popUpTo(0) // vide l'historique pour que "retour" ne ramène pas dans l'app
+                    }
+                }
             )
         }
     }
