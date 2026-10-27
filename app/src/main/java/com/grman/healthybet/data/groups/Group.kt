@@ -1,4 +1,4 @@
-package com.grman.healthybet.data
+package com.grman.healthybet.data.groups
 
 import com.google.firebase.firestore.DocumentId
 

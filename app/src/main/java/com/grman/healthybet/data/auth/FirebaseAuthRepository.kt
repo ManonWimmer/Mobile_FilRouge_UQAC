@@ -15,44 +15,38 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth = FirebaseAuth.getIn
                              private val db: FirebaseFirestore = FirebaseFirestore.getInstance()): AuthRepository {
 
     // Connexion
-    override suspend fun signIn(email: String, password: String): Result<Unit> =
+    override suspend fun signIn(email: String, password: String) {
         try {
             auth.signInWithEmailAndPassword(email, password).await()
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(Exception(e.toSignInMessage(), e))
+        } catch (e: FirebaseAuthInvalidUserException) {
+            throw Exception("Email ou mot de passe incorrect")
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            throw Exception("Email ou mot de passe incorrect")
+        } catch (e: FirebaseNetworkException) {
+            throw Exception("Problème de connexion réseau")
         }
-
-    override suspend fun sendPasswordReset(email: String): Result<Unit> =
-        try {
-            auth.sendPasswordResetEmail(email).await()
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(Exception(e.toSignInMessage(), e))
-        }
-
-    private fun Exception.toSignInMessage(): String = when (this) {
-        is FirebaseAuthInvalidUserException,
-        is FirebaseAuthInvalidCredentialsException -> "Email ou mot de passe incorrect"
-        is FirebaseNetworkException -> "Problème de connexion réseau"
-        else -> message ?: "Erreur de connexion"
     }
 
-    // Sign up
-    override suspend fun signUp(email: String, password: String, pseudo: String, emoji: String): Result<Unit> {
-        return try {
+    // Mot de passe oublié
+    override suspend fun sendPasswordReset(email: String) {
+        try {
+            auth.sendPasswordResetEmail(email).await()
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            throw Exception("Adresse email invalide")
+        } catch (e: FirebaseNetworkException) {
+            throw Exception("Problème de connexion réseau")
+        }
+    }
+
+    //  Inscription
+    override suspend fun signUp(email: String, password: String, pseudo: String, emoji: String) {
+        try {
             // Création du compte email / password
             val user = auth.createUserWithEmailAndPassword(email, password).await().user
-                ?: return Result.success(Unit) // user null : on termine quand même (à gérer plus tard)
+                ?: error("Création du compte impossible")
 
             // Pseudo dans Firebase Auth
-            val profile = UserProfileChangeRequest.Builder()
-                .setDisplayName(pseudo)
-                .build()
+            val profile = UserProfileChangeRequest.Builder().setDisplayName(pseudo).build()
             user.updateProfile(profile).await()
 
             // Membre dans Firestore : id + pseudo + emoji
@@ -61,22 +55,15 @@ class FirebaseAuthRepository(private val auth: FirebaseAuth = FirebaseAuth.getIn
                 "username" to pseudo,
                 "emoji" to emoji.ifBlank { "😄" }
             )
-
             db.collection("members").document(user.uid).set(member).await()
-
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(Exception(e.toSignUpMessage(), e))
+        } catch (e: FirebaseAuthUserCollisionException) {
+            throw Exception("Cet email est déjà utilisé")
+        } catch (e: FirebaseAuthWeakPasswordException) {
+            throw Exception("Mot de passe trop faible")
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            throw Exception("Adresse email invalide")
+        } catch (e: FirebaseNetworkException) {
+            throw Exception("Problème de connexion réseau")
         }
-    }
-
-    private fun Exception.toSignUpMessage(): String = when (this) {
-        is FirebaseAuthUserCollisionException -> "Cet email est déjà utilisé"
-        is FirebaseAuthWeakPasswordException -> "Mot de passe trop faible"
-        is FirebaseAuthInvalidCredentialsException -> "Adresse email invalide"
-        is FirebaseNetworkException -> "Problème de connexion réseau"
-        else -> message ?: "Erreur lors de l'inscription"
     }
 }

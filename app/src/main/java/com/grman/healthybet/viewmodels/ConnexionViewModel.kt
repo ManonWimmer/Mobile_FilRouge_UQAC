@@ -32,9 +32,12 @@ class ConnexionViewModel(private val authRepository: AuthRepository = FirebaseAu
 
         // Connexion au compte dans firebase email / password
         viewModelScope.launch {
-            authRepository.signIn(email.trim(), password)
-                .onSuccess { onSuccess() }
-                .onFailure { errorMessage = it.message ?: "Erreur de connexion" }
+            try {
+                authRepository.signIn(email.trim(), password)
+                onSuccess()
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Erreur de connexion"
+            }
             isLoading = false
         }
     }
@@ -45,8 +48,11 @@ class ConnexionViewModel(private val authRepository: AuthRepository = FirebaseAu
             return
         }
         viewModelScope.launch {
-            authRepository.sendPasswordReset(email.trim())
-                .onFailure { errorMessage = it.message }
+            try {
+                authRepository.sendPasswordReset(email.trim())
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Erreur lors de la réinitialisation"
+            }
         }
     }
 }

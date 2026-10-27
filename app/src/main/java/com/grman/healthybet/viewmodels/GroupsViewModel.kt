@@ -5,17 +5,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.grman.healthybet.data.Group
+import com.grman.healthybet.data.groups.FirebaseGroupRepository
+import com.grman.healthybet.data.groups.Group
+import com.grman.healthybet.data.groups.GroupRepository
+import kotlinx.coroutines.launch
 
-class GroupsViewModel : ViewModel() {
-
-    private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance();
-    private val uid: String? get() = auth.currentUser?.uid
+class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGroupRepository()) : ViewModel() {
 
     val myGroups = mutableStateListOf<Group>()
     val discoverGroups = mutableStateListOf<Group>()
@@ -31,30 +30,13 @@ class GroupsViewModel : ViewModel() {
 
     // Charge les groupes depuis Firestore et les range dans myGroups ou discoverGroups
     fun loadGroups() {
-        // Check id
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            errorMessage = "Utilisateur non connecté"
-            return
-        }
-
-        db.collection("groups").get()
-            .addOnSuccessListener { result ->
-                myGroups.clear()
-                discoverGroups.clear()
-
-                for (group in result.toObjects(Group::class.java)) {
-                    // User id -> my groups
-                    if (uid in group.members) {
-                        myGroups.add(group)
-                    } else { // Else -> discover groups
-                        discoverGroups.add(group)
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
+        viewModelScope.launch {
+            try {
+                refreshGroups()
+            } catch (e: Exception) {
                 errorMessage = e.message ?: "Erreur de chargement des groupes"
             }
+        }
     }
 
 
@@ -64,46 +46,37 @@ class GroupsViewModel : ViewModel() {
             return
         }
 
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            errorMessage = "Utilisateur non connecté"
-            return
-        }
-
         isLoading = true
         errorMessage = null
 
-        // New groupe avec 1 membre le user
-        val group = hashMapOf(
-            "name" to name.trim(),
-            "emoji" to emoji,
-            "description" to description.trim(),
-            "ownerId" to uid,
-            "members" to listOf(uid)
-        )
-
-        db.collection("groups").add(group)
-            .addOnSuccessListener {
-                isLoading = false
-                loadGroups()
+        viewModelScope.launch {
+            try {
+                groupRepository.createGroup(name.trim(), emoji, description.trim())
+                refreshGroups()
                 onSuccess()
-            }
-            .addOnFailureListener { e ->
-                isLoading = false
+            } catch (e: Exception) {
                 errorMessage = e.message ?: "Erreur de création du groupe"
             }
+            isLoading = false
+        }
     }
 
     fun joinGroup(groupId: String) {
-        // Check uid
-        val uid = auth.currentUser?.uid ?: return
-
-        // Add id to members from group
-        db.collection("groups").document(groupId)
-            .update("members", FieldValue.arrayUnion(uid))
-            .addOnSuccessListener { loadGroups() }
-            .addOnFailureListener { e ->
+        viewModelScope.launch {
+            try {
+                groupRepository.joinGroup(groupId)
+                refreshGroups()
+            } catch (e: Exception) {
                 errorMessage = e.message ?: "Impossible de rejoindre le groupe"
             }
+        }
+    }
+
+    private suspend fun refreshGroups() {
+        val overview = groupRepository.getGroups()
+        myGroups.clear()
+        myGroups.addAll(overview.mine)
+        discoverGroups.clear()
+        discoverGroups.addAll(overview.discover)
     }
 }

@@ -34,7 +34,7 @@ import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
-import com.grman.healthybet.data.Group
+import com.grman.healthybet.data.groups.Group
 import com.grman.healthybet.viewmodels.GroupsViewModel
 
 @Composable

@@ -42,9 +42,12 @@ class SignUpViewModel(private val authRepository: AuthRepository = FirebaseAuthR
 
         // Creation du compte dans firebase email / password
         viewModelScope.launch {
-            authRepository.signUp(email.trim(), password, pseudo.trim(), emoji)
-                .onSuccess { onSuccess() }
-                .onFailure { errorMessage = it.message ?: "Erreur lors de l'inscription" }
+            try {
+                authRepository.signUp(email.trim(), password, pseudo.trim(), emoji)
+                onSuccess()
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Erreur lors de l'inscription"
+            }
             isLoading = false
         }
     }

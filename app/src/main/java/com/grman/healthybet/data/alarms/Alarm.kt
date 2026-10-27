@@ -1,4 +1,4 @@
-package com.grman.healthybet.data
+package com.grman.healthybet.data.alarms
 
 data class Alarm(
     val time: String,
