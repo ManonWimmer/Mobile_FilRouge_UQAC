@@ -8,7 +8,8 @@ data class Group(
     val emoji: String = "",
     val description: String = "",
     val ownerId: String = "",
-    val members: List<String> = emptyList() // uid des membres
+    val members: List<String> = emptyList(), // uid des membres
+    val points: Map<String, Long> = emptyMap() // uid / points
 ) {
     val memberCount: Int get() = members.size
 

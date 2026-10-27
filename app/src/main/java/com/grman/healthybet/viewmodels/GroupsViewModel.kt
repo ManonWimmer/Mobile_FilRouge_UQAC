@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grman.healthybet.data.groups.FirebaseGroupRepository
 import com.grman.healthybet.data.groups.Group
+import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.data.groups.GroupRepository
 import kotlinx.coroutines.launch
 
@@ -18,6 +19,7 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
 
     val myGroups = mutableStateListOf<Group>()
     val discoverGroups = mutableStateListOf<Group>()
+    val groupMembers = mutableStateListOf<GroupMember>()
 
     var searchQuery by mutableStateOf("")
     var isLoading by mutableStateOf(false)
@@ -100,5 +102,17 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
 
         discoverGroups.clear()
         discoverGroups.addAll(overview.discover)
+    }
+
+    fun loadGroupMembers(groupId: String) {
+        viewModelScope.launch {
+            try {
+                val members = groupRepository.getGroupMembers(groupId)
+                groupMembers.clear()
+                groupMembers.addAll(members)
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Erreur de chargement des membres"
+            }
+        }
     }
 }

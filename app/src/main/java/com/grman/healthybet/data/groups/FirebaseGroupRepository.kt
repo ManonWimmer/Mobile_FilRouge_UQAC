@@ -43,4 +43,27 @@ class FirebaseGroupRepository(
             .update("members", FieldValue.arrayRemove(uid()))
             .await()
     }
+
+    override suspend fun getGroupMembers(groupId: String): List<GroupMember> {
+        // Le groupe : liste des membres + points
+        val group = db.collection("groups").document(groupId).get().await()
+            .toObject(Group::class.java) ?: return emptyList()
+
+        // Le profil de chaque membre
+        val result = mutableListOf<GroupMember>()
+        for (uid in group.members) {
+            val profile = db.collection("members").document(uid).get().await()
+            result.add(
+                GroupMember(
+                    id = uid,
+                    username = profile.getString("username") ?: "?",
+                    emoji = profile.getString("emoji") ?: "😄",
+                    points = (group.points[uid] ?: 0L).toInt()
+                )
+            )
+        }
+
+        // Classé du plus de points au moins
+        return result.sortedByDescending { it.points }
+    }
 }

@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -91,6 +93,18 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
         Spacer(modifier = Modifier.height(20.dp))
 
         GroupAlarmCard()
+
+        LaunchedEffect(groupId) { viewModel.loadGroupMembers(groupId) } // Get group members
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(text = "Classement", color = Color.White, style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        viewModel.groupMembers.forEachIndexed { index, member ->
+            MemberRow(rank = index + 1, member = member)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 
     // Confirmation avant de quitter
@@ -174,6 +188,20 @@ private fun GroupAlarmCard() {
                 Text(text = "Rejoindre l'alarme", style = MaterialTheme.typography.labelSmall)
             }
         }
+    }
+}
+
+@Composable
+private fun MemberRow(rank: Int, member: GroupMember) {
+    Row(
+        modifier = Modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "$rank", color = GraySubtitle, modifier = Modifier.width(24.dp))
+        Text(text = member.emoji, fontSize = 18.sp)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = member.username, color = Color.White, modifier = Modifier.weight(1f))
+        Text(text = "${member.points} pts", color = GreenAccent)
     }
 }
 
