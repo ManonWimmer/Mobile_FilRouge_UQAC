@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
 
                                 // Change le logo selon la fenetre so far pas besoin de plus
                                 selected = when (currentRoute) {
+                                    Routes.HOME -> BottomNavItem.Home
                                     Routes.ALARM -> BottomNavItem.Alarms
                                     Routes.GROUPS -> BottomNavItem.Groups
                                     Routes.PROFILE -> BottomNavItem.Profile
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onItemSelected = { item ->
                                     val route = when (item) {
+                                        BottomNavItem.Home -> Routes.HOME
                                         BottomNavItem.Alarms -> Routes.ALARM
                                         BottomNavItem.Groups -> Routes.GROUPS
                                         BottomNavItem.Profile -> Routes.PROFILE
