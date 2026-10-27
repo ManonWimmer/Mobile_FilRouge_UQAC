@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resources>
     <string name="app_name">HealthyBet</string>
+    <string name="app_title">An alarm clock that really motivates.</string>
+    <string name="app_pitch">Take care of your body to prove to your friends that they’re wrong to doubt you. Accept the challenge or pay the penalty!</string>
+
+    <string name="sign_up">Sign up</string>
+    <string name="log_in">Log in</string>
 </resources>

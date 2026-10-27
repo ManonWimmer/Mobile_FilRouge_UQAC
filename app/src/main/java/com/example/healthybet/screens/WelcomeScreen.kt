@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,7 +62,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
 
             // App Name
             Text(
-                text = "Healthy Bet",
+                text = stringResource(R.string.app_name),
                 color = Color.White,
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center
@@ -71,7 +72,8 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
 
             // Main Title
             Text(
-                text = "Un réveil qui motive vraiment.",
+                text = stringResource(R.string.app_title),
+
                 color = Color(0xFF29CE83),
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
@@ -81,8 +83,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
 
             // Description
             Text(
-                text = "Prends soin de ton corps pour prouver à tes potes qu'ils ont tort de douter de toi. " +
-                        "Relève le défi ou paie le gage !",
+                text = stringResource(R.string.app_pitch),
                 color = GrayLabel,
                 style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center
@@ -98,7 +99,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
             ) {
                 Text(
-                    text = "Inscription",
+                    text = stringResource(R.string.sign_up),
                     style = MaterialTheme.typography.labelLarge
                 )
             }
@@ -113,7 +114,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
                 colors = ButtonDefaults.buttonColors(containerColor = FieldBg)
             ) {
                 Text(
-                    text = "Connexion",
+                    text = stringResource(R.string.log_in),
                     style = MaterialTheme.typography.labelLarge
                 )
             }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">HealthyBet</string>
+    <string name="app_title">Un réveil qui motive vraiment.</string>
+    <string name="app_pitch">Prends soin de ton corps pour prouver à tes potes qu\'ils ont tort de douter de toi. Relève le défi ou paie le gage !</string>
+
+    <string name="sign_up">Inscription</string>
+    <string name="log_in">Connexion</string>
+</resources>
