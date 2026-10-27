@@ -4,17 +4,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.grman.healthybet.data.auth.AuthRepository
+import com.grman.healthybet.data.auth.FirebaseAuthRepository
+import kotlinx.coroutines.launch
 
-class ConnexionViewModel() : ViewModel() {
+class ConnexionViewModel(private val authRepository: AuthRepository = FirebaseAuthRepository()) : ViewModel() {
 
     var email by mutableStateOf("")
     var password by mutableStateOf("")
 
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
-
-    private val auth = FirebaseAuth.getInstance()
 
     fun signIn(onSuccess: () -> Unit) {
 
@@ -29,16 +31,22 @@ class ConnexionViewModel() : ViewModel() {
         errorMessage = null
 
         // Connexion au compte dans firebase email / password
-        auth.signInWithEmailAndPassword(email.trim(), password)
-            .addOnSuccessListener { // succes
-                isLoading = false
-                onSuccess()
-            }
-            .addOnFailureListener { e -> // fail
-                isLoading = false
-                errorMessage = e.message ?: "Erreur de connexion"
-            }
+        viewModelScope.launch {
+            authRepository.signIn(email.trim(), password)
+                .onSuccess { onSuccess() }
+                .onFailure { errorMessage = it.message ?: "Erreur de connexion" }
+            isLoading = false
+        }
     }
 
-    // todo: mdp oublié pour reset password (auth.sendPasswordResetEmail(email))
+    fun resetPassword() {
+        if (email.isBlank()) {
+            errorMessage = "Entre ton email pour réinitialiser le mot de passe"
+            return
+        }
+        viewModelScope.launch {
+            authRepository.sendPasswordReset(email.trim())
+                .onFailure { errorMessage = it.message }
+        }
+    }
 }
