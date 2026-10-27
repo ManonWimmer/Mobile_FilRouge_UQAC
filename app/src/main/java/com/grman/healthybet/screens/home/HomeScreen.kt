@@ -76,11 +76,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
             }
     }
 
-    val friendBets = listOf(
-        FriendBet("😐", "Sarah J.", "Y ARRIVERA (+100 pts)", success = true),
-        FriendBet("😎", "Thomas L.", "ÉCHOUERA", success = false)
-    )
-
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)){
 
         // Header
@@ -100,17 +95,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
                     text = "Salut, $userName !",
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            // Notifications
-            Box(modifier = Modifier.size(40.dp).background(FieldBg, MediumRoundedCornerShape), contentAlignment = Alignment.Center){
-                Icon(
-                    imageVector = Icons.Filled.Notifications,
-                    contentDescription = "Notifications",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-
                 )
             }
         }
@@ -162,7 +146,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Text Objectif réveil
+                // Text Objectif réveil (todo: bdd)
                 Text(
                     text = "\uD83C\uDFC3 Courir 5km avant 07:15", // (emoji courir)
                     color = GraySubtitle,
@@ -175,36 +159,10 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Reveil enjeu
+                // Membre (todo: bdd)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Enjeu : Un pack de bières artisanales",
-                        color = GraySubtitle,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f)
-                    )
                     Text(text = "\uD83D\uDE0F\uD83D\uDE0F\uD83D\uDE0F", fontSize = 14.sp) // (emojis personnes)
                 }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Text paris des potes
-        Text(
-            text = "Pari de tes potes sur toi",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Paris affichés
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            friendBets.forEach { bet ->
-                FriendBetCard(bet = bet, modifier = Modifier.weight(1f))
             }
         }
 
@@ -220,42 +178,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
             Text(
                 text = "+  Nouveau Réveil / Pari",
                 style = MaterialTheme.typography.labelLarge
-            )
-        }
-    }
-}
-
-@Composable
-private fun FriendBetCard(bet: FriendBet, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.background(FieldBg, MediumRoundedCornerShape).padding(14.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            // Friend icon
-            Box(modifier = Modifier.size(32.dp).background(Color.White.copy(alpha = 0.08f), CircleShape), contentAlignment = Alignment.Center) {
-                Text(text = bet.emoji, fontSize = 16.sp)
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Friend name
-            Text(
-                text = bet.name,
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Pari prediction (+ couleur fail)
-        Box(
-            modifier = Modifier.fillMaxWidth().background(if (bet.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(vertical = 6.dp),) {
-            Text(
-                text = bet.prediction,
-                color = if (bet.success) GreenAccent else RedFail,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
             )
         }
     }

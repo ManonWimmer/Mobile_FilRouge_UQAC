@@ -43,8 +43,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.grman.healthybet.enums.HealthObjective
-import com.grman.healthybet.enums.StakeType
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -64,10 +62,7 @@ fun CreateAlarmScreen(
     // todo: lier à un ViewModel
 
     val timeState = rememberTimePickerState(initialHour = 6, initialMinute = 30, is24Hour = true)
-    var objective by remember { mutableStateOf(HealthObjective.Course) }
     var target by remember { mutableStateOf("") }
-    var stakeType by remember { mutableStateOf(StakeType.Gage) }
-    var stake by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -123,101 +118,25 @@ fun CreateAlarmScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Text Objectif santé
-        Text(
-            text = "OBJECTIF SANTÉ",
-            color = GraySubtitle,
-            style = MaterialTheme.typography.labelMedium
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Layour de gauche à droite avec size différents + wrap next line
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            HealthObjective.entries.forEach { item ->
-                ObjectiveChip(
-                    objective = item,
-                    selected = item == objective,
-                    onClick = { objective = item }
-                )
-            }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Text Valeur cible & heure limite
         Text(
-            text = "Valeur cible & Heure limite",
+            text = "Heure limite",
             color = GraySubtitle,
             style = MaterialTheme.typography.bodySmall
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // To do : heure sélectionnable plus facilement
         AlarmTextField(
             value = target,
             onValueChange = { target = it },
-            placeholder = "5 km avant 07:15"
+            placeholder = "5 000 pas avant 07:15"
         )
 
         Spacer(modifier = Modifier.height(20.dp))
-
-        // Enjeu / contrat du pari
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(FieldBg, HighRoundedCornerShape)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "ENJEU / CONTRAT DU PARI",
-                color = GraySubtitle,
-                style = MaterialTheme.typography.labelMedium
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Button gage soit physique soit points
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StakeTypeButton(
-                    text = "Un gage physique",
-                    selected = stakeType == StakeType.Gage,
-                    onClick = { stakeType = StakeType.Gage },
-                    modifier = Modifier.weight(1f)
-                )
-                StakeTypeButton(
-                    text = "Points (ex: 200 pts)",
-                    selected = stakeType == StakeType.Points,
-                    onClick = { stakeType = StakeType.Points },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // todo: faire mieux plus tard pour avoir des trucs différents en fonction plutot qu'une zone de texte pour les 2
-            // genre les points avoir un truc avec que des int etc..., gages liste prédéfinie jsp ?
-
-            // Text précision du gage
-            Text(
-                text = "Précise le gage ou l'enjeu",
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Text field gage
-            AlarmTextField(
-                value = stake,
-                onValueChange = { stake = it },
-                placeholder = if (stakeType == StakeType.Gage) "Offrir un pack de bières artisanales" else "200 pts"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
 
         // Bouton programmer réveil
         Button(
@@ -234,62 +153,6 @@ fun CreateAlarmScreen(
     }
 }
 
-// Encadré avec emoji + objective name sélectionné ou pas
-@Composable
-private fun ObjectiveChip(objective: HealthObjective, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        // Couleur diff selon selection
-        modifier = modifier
-            .background(
-                if (selected) GreenAccent else FieldBg,
-                LittleRoundedCornerShape
-            )
-            .border(
-                1.dp,
-                if (selected) GreenAccent else Color.White.copy(alpha = 0.1f),
-                LittleRoundedCornerShape
-            )
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Text emoji
-        Text(text = objective.emoji, style = MaterialTheme.typography.labelSmall)
-
-        Spacer(modifier = Modifier.size(6.dp))
-
-        // Text nom objectif
-        Text(
-            text = objective.label,
-            color = if (selected) Color.Black else Color.White,
-            fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
-}
-
-// Bouton gage (soit physique soit points)
-@Composable
-private fun StakeTypeButton(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.height(40.dp),
-        shape = LittleRoundedCornerShape,
-        border = BorderStroke(1.dp, if (selected) GreenAccent else Color.White.copy(alpha = 0.1f)),
-        // Couleurs diff selon selection
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (selected) GreenAccent.copy(alpha = 0.15f) else Color.Transparent,
-            contentColor = if (selected) GreenAccent else Color.White
-        ),
-        contentPadding = PaddingValues(horizontal = 4.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 1
-        )
-    }
-}
 
 // Text field classique mais qui a une bordure de couleur quand selectionné
 @Composable

@@ -119,16 +119,9 @@ private fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Reveil enjeu
-        // todo: parieurs
+        // Membres
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Enjeu : Un pack de bières artisanales",
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.weight(1f)
-            )
-            Text(text = "\uD83D\uDE0F\uD83D\uDE0F\uD83D\uDE0F", fontSize = 14.sp) // (emojis personnes)
+            Text(text = "\uD83D\uDE0F\uD83D\uDE0F\uD83D\uDE0F", fontSize = 14.sp) // todo : (emojis personnes)
         }
     }
 }

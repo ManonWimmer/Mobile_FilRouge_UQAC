@@ -68,9 +68,9 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
                     color = GraySubtitle,
                     style = MaterialTheme.typography.bodySmall
                 )
-            }
 
-            HeaderButton(icon = Icons.Filled.Settings, description = "Paramètres", onClick = { /* todo */ })
+                // todo: bouton leave group
+            }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -95,7 +95,7 @@ private fun HeaderButton(icon: ImageVector, description: String, onClick: () -> 
 private fun GroupAlarmCard() {
     Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
 
-        // Membre emoji + nom + heure (todo: bdd)
+        // Membre emoji + nom + heure (todo: bdd avec celui qui le propose)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(36.dp).background(Color.White.copy(alpha = 0.08f), CircleShape), contentAlignment = Alignment.Center) {
                 Text(text = "🤔", fontSize = 18.sp)
@@ -124,12 +124,6 @@ private fun GroupAlarmCard() {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Paris pour / contre (todo: bdd)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            BetTag(text = "4 PARIENT POUR", color = GreenAccent)
-            BetTag(text = "1 CONTRE", color = RedFail)
-        }
-
         Spacer(modifier = Modifier.height(14.dp))
 
         // Boutons
@@ -142,25 +136,7 @@ private fun GroupAlarmCard() {
             ) {
                 Text(text = "Rejoindre l'alarme", style = MaterialTheme.typography.labelSmall)
             }
-
-            OutlinedButton(
-                onClick = { /* todo: parier */ },
-                modifier = Modifier.weight(1f).height(44.dp),
-                shape = LittleRoundedCornerShape,
-                border = BorderStroke(1.dp, GreenAccent),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenAccent)
-            ) {
-                Text(text = "Parier", style = MaterialTheme.typography.labelSmall)
-            }
         }
-    }
-}
-
-// Badge (pour / contre)
-@Composable
-private fun BetTag(text: String, color: Color) {
-    Box(modifier = Modifier.background(color.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 8.dp, vertical = 4.dp)) {
-        Text(text = text, color = color, style = MaterialTheme.typography.labelSmall)
     }
 }
 
