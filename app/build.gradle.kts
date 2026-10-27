@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.grman.healthybet"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
@@ -64,4 +64,5 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("androidx.health.connect:connect-client:1.1.0")
 }
