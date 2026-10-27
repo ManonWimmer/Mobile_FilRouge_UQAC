@@ -37,4 +37,10 @@ class FirebaseGroupRepository(
             .update("members", FieldValue.arrayUnion(uid()))
             .await()
     }
+
+    override suspend fun leaveGroup(groupId: String) {
+        db.collection("groups").document(groupId)
+            .update("members", FieldValue.arrayRemove(uid()))
+            .await()
+    }
 }

@@ -62,6 +62,9 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
     }
 
     fun joinGroup(groupId: String) {
+        isLoading = true
+        errorMessage = null
+
         viewModelScope.launch {
             try {
                 groupRepository.joinGroup(groupId)
@@ -69,13 +72,32 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Impossible de rejoindre le groupe"
             }
+            isLoading = false;
+        }
+    }
+
+    fun leaveGroup(groupId: String, onSuccess: () -> Unit) {
+        isLoading = true
+        errorMessage = null
+
+        viewModelScope.launch {
+            try {
+                groupRepository.leaveGroup(groupId)
+                refreshGroups()
+                onSuccess()
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Impossible de quitter le groupe"
+            }
+            isLoading = false
         }
     }
 
     private suspend fun refreshGroups() {
         val overview = groupRepository.getGroups()
+
         myGroups.clear()
         myGroups.addAll(overview.mine)
+
         discoverGroups.clear()
         discoverGroups.addAll(overview.discover)
     }
