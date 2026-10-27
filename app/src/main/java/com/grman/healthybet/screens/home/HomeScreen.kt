@@ -76,7 +76,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
             }
     }
 
-    val streakDays = 5
     val friendBets = listOf(
         FriendBet("😐", "Sarah J.", "Y ARRIVERA (+100 pts)", success = true),
         FriendBet("😎", "Thomas L.", "ÉCHOUERA", success = false)
@@ -101,15 +100,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
                     text = "Salut, $userName !",
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
-                )
-
-                Spacer(modifier = Modifier.height(2.dp))
-
-                // Text streaks
-                Text(
-                    text = "\uD83D\uDD25 $streakDays jours de streak", // (emoji feu)
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium
                 )
             }
 

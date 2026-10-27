@@ -37,7 +37,6 @@ import com.grman.healthybet.ui.theme.RedFail
 @Composable
 fun AlarmsScreen(modifier: Modifier = Modifier){
 
-    val streakDays = 5 // todo: use profile value
     val alarms = listOf(
         Alarm(
             "06:30",
@@ -62,15 +61,6 @@ fun AlarmsScreen(modifier: Modifier = Modifier){
                     text = "Tes Réveils",
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium
-                )
-            }
-
-            // Text streak
-            Box(modifier = Modifier.background(GreenAccent.copy(alpha = 0.15f), MediumRoundedCornerShape).padding(PaddingValues(10.dp)), contentAlignment = Alignment.Center){
-                Text(
-                    text = "\uD83D\uDD25 $streakDays Streak", // (emoji feu)
-                    color = GreenAccent,
-                    style = MaterialTheme.typography.titleSmall
                 )
             }
         }

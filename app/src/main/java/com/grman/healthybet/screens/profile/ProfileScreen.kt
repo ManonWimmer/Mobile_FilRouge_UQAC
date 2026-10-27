@@ -61,7 +61,6 @@ fun ProfileScreen(
     }
 
     // todo: vraies stats depuis la bdd
-    val streakDays = 5
     val points = 1200
     val alarmsDone = 12
 
@@ -113,7 +112,6 @@ fun ProfileScreen(
 
         // Stats
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(value = "\uD83D\uDD25 $streakDays", label = "Streak", modifier = Modifier.weight(1f))
             StatCard(value = "$points", label = "Points", modifier = Modifier.weight(1f))
             StatCard(value = "$alarmsDone", label = "Réveils réussis", modifier = Modifier.weight(1f))
         }
