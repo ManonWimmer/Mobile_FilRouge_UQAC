@@ -1,14 +1,9 @@
 package com.grman.healthybet.screens.alarms
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +22,6 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -40,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.grman.healthybet.ui.theme.FieldBg
@@ -50,7 +43,20 @@ import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
-
+import android.Manifest
+import android.app.AlarmManager
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.grman.healthybet.alarm.AlarmScheduler
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class) // pour rememberTimePickerState
@@ -59,10 +65,44 @@ fun CreateAlarmScreen(
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {}) {
 
+    val context = LocalContext.current
+
+    val notifPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* gérer le refus */ }
+
     // todo: lier à un ViewModel
 
     val timeState = rememberTimePickerState(initialHour = 6, initialMinute = 30, is24Hour = true)
     var target by remember { mutableStateOf("") }
+
+    fun programmer() {
+        //Permission notifications (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        //Planification
+        val trigger = AlarmScheduler.schedule(
+            context = context,
+            hour = timeState.hour,
+            minute = timeState.minute,
+            objective = target,
+        )
+
+        if (trigger == null) {
+            //Permission "alarmes exactes" manquante = ouvrir les parametres
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                context.startActivity(
+                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+                )
+            }
+            Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show()
+        } else {
+            val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger)) //J'ai aucune idée de ce que c'est ici
+            Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Column(
         modifier = modifier
@@ -140,7 +180,7 @@ fun CreateAlarmScreen(
 
         // Bouton programmer réveil
         Button(
-            onClick = { /* todo */},
+            onClick = { programmer() },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = LittleRoundedCornerShape,
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
