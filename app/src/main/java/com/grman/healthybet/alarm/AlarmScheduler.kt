@@ -9,7 +9,7 @@ import java.util.Calendar
 
 object AlarmScheduler {
 
-    /** Retourne l'heure de déclenchement (ms) ou null si la permission d'alarme exacte manque. */
+    /* Retourne l'heure de déclenchement (ms) ou null si la permission d'alarme exacte manque */
     fun schedule(
         context: Context,
         hour: Int,
@@ -28,7 +28,6 @@ object AlarmScheduler {
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            // Si l'heure est déjà passée aujourd'hui → demain
             if (timeInMillis <= System.currentTimeMillis()) add(Calendar.DAY_OF_YEAR, 1)
         }
 
@@ -40,13 +39,13 @@ object AlarmScheduler {
             context, id, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        // Intent ouvert quand on tape sur l'icône d'alarme dans la barre de statut
+        // Intent ouvert quand on tape sur l'icône d'alarme
         val showIntent = PendingIntent.getActivity(
             context, id, Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        // setAlarmClock = la plus fiable : réveille l'appareil même en mode Doze
+        // setAlarmClock = meme doze
         am.setAlarmClock(AlarmManager.AlarmClockInfo(cal.timeInMillis, showIntent), operation)
         return cal.timeInMillis
     }
