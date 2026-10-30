@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grman.healthybet.data.alarms.Alarm
+import com.grman.healthybet.data.alarms.AlarmData
+import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -38,16 +38,24 @@ import com.grman.healthybet.ui.theme.RedFail
 fun AlarmsScreen(modifier: Modifier = Modifier){
 
     val alarms = listOf(
-        Alarm(
-            "06:30",
-            "EN COURS",
-            true,
-            false,
+        AlarmData(
+            "0",
+            6,
+            30,
             "\uD83C\uDFC3 Courir 5km avant 07:15",
-            "Pack de bières"
+            AlarmState.EN_COURS,
+            false,
+            true,
         ),
-        Alarm("07:00", "RÉUSSI ✓", true, true,"\uD83D\uDEB6 10 000 pas avant 12:00", "200 Points"),
-        Alarm("06:00", "ÉCHOUÉ ✗", false, true, "\uD83C\uDFCB\uFE0F 45 min de CrossFit avant 7h30", "Faire le ménage"),
+        AlarmData(
+            "0",
+            6,
+            30,
+            "\uD83C\uDFC3 Courir 5km avant 07:15",
+            AlarmState.FINIT,
+            true,
+            true,
+        )
     )
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)){
@@ -71,21 +79,21 @@ fun AlarmsScreen(modifier: Modifier = Modifier){
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             alarms.forEach { alarm ->
-                AlarmCard(alarm = alarm, modifier = Modifier.then(if (!alarm.finished) { Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape) } else { Modifier }))
+                AlarmCard(alarmData = alarm, modifier = Modifier.then(if (!alarm.enabled) { Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape) } else { Modifier }))
             }
         }
     }
 }
 
 @Composable
-private fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
+private fun AlarmCard(alarmData: AlarmData, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).padding(14.dp)) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
             // Alarm time
             Text(
-                text = alarm.time,
+                text = alarmData.hour.toString() + " : " + alarmData.minute.toString(),
                 color = Color.White,
                 style = MaterialTheme.typography.displayMedium
             )
@@ -94,10 +102,10 @@ private fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.weight(1f))
 
             // Alarm status badge
-            Box(modifier = Modifier.background(if (alarm.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
+            Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Text(
-                    text = alarm.status,
-                    color = if (alarm.success) GreenAccent else RedFail,
+                    text = alarmData.advancement.toString(),
+                    color = if (alarmData.success) GreenAccent else RedFail,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center
                 )
@@ -108,7 +116,7 @@ private fun AlarmCard(alarm: Alarm, modifier: Modifier = Modifier) {
 
         // Text Objectif réveil
         Text(
-            text = alarm.objective,
+            text = alarmData.objective,
             color = GraySubtitle,
             style = MaterialTheme.typography.bodyMedium
         )
