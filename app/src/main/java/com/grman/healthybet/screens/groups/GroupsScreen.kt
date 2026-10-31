@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.grman.healthybet.R
 import com.grman.healthybet.data.groups.Group
 import com.grman.healthybet.ui.theme.FieldBg
+import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
@@ -105,6 +108,7 @@ fun GroupsScreen(
             // Search groups
             else -> SearchGroupContent(
                 viewModel = viewModel,
+                onGroupClick = onGroupClick,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -183,7 +187,65 @@ private fun MyGroupsContent(groups: List<Group>, onGroupClick: (String) -> Unit,
 }
 
 @Composable
-private fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun SearchGroupContent(viewModel: GroupsViewModel, onGroupClick: (String) -> Unit, modifier: Modifier = Modifier) {
+    val results = viewModel.filteredDiscover
+
+    Column(modifier = modifier.fillMaxSize()) {
+
+        // Barre de recherche
+        GroupTextField(
+            value = viewModel.searchQuery,
+            onValueChange = { viewModel.searchQuery = it },
+            placeholder = stringResource(R.string.search_group),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = stringResource(R.string.search),
+                    tint = GrayLabel
+                )
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = if (viewModel.searchQuery.isBlank()) stringResource(R.string.all_groups) else stringResource(R.string.results),
+            color = GraySubtitle,
+            style = MaterialTheme.typography.labelMedium
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+            // Pas de groupe
+            if (results.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.no_group_found),
+                        color = GraySubtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp)
+                    )
+                }
+            }
+
+            // Chaque groupe : une card
+            items(results, key = { it.id }) { group ->
+                val isMember = viewModel.myGroups.any { it.id == group.id }
+                GroupCard(
+                    group = group,
+                    onClick = { onGroupClick(group.id) },
+                    onJoinClick = if (isMember) null else { { viewModel.joinGroup(group.id) } }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Modifier, onJoinClick: (() -> Unit)? = null ) {
     Column(modifier = modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).border(1.dp, Color.White.copy(alpha = 0.08f), MediumRoundedCornerShape).clickable { onClick() }.padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -207,6 +269,19 @@ private fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Mo
 
             // Aperçu des membres avec emojis temp (todo: photos de profil)
             Text(text = group.memberEmojis.take(3).joinToString(""), fontSize = 20.sp)
+        }
+
+        // Bouton rejoindre (uniquement pour les groupes à découvrir)
+        if (onJoinClick != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = onJoinClick,
+                modifier = Modifier.fillMaxWidth().height(40.dp),
+                shape = LittleRoundedCornerShape,
+                colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
+            ) {
+                Text(text = stringResource(R.string.join_group), style = MaterialTheme.typography.labelSmall)
+            }
         }
     }
 }

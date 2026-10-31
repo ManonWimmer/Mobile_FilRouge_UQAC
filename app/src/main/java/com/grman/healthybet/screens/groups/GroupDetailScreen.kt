@@ -59,6 +59,7 @@ import com.grman.healthybet.viewmodels.GroupsViewModel
 @Composable
 fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Modifier = Modifier, onBack: () -> Unit = {}) {
     val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
+    val isMember = viewModel.myGroups.any { it.id == groupId }
     var showLeaveDialog by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)) {
@@ -83,18 +84,34 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                // Bouton quitter le groupe
-                HeaderButton(
-                    icon = Icons.AutoMirrored.Filled.ExitToApp,
-                    description = stringResource(R.string.leave_group),
-                    onClick = { showLeaveDialog = true }
-                )
+
+                if (isMember) {
+                    // Bouton quitter le groupe
+                    HeaderButton(
+                        icon = Icons.AutoMirrored.Filled.ExitToApp,
+                        description = stringResource(R.string.leave_group),
+                        onClick = { showLeaveDialog = true }
+                    )
+                } else {
+                    // Bouton rejoindre le groupe
+                    Button(
+                        onClick = { viewModel.joinGroup(groupId) },
+                        modifier = Modifier.height(40.dp),
+                        shape = LittleRoundedCornerShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
+                    ) {
+                        Text(text = stringResource(R.string.join_group), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        GroupAlarmCard()
+        // Afficher alarms si membre du groupe
+        if (isMember) {
+            GroupAlarmCard()
+        }
 
         LaunchedEffect(groupId) { viewModel.loadGroupMembers(groupId) } // Get group members
 
