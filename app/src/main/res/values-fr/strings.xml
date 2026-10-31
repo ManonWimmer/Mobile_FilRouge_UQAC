@@ -54,7 +54,7 @@
 
     // Group detail screen
     <string name="default_group_name">Groupe</string>
-    <string name="active_members">%1$i membre.s actif.s</string>
+    <string name="active_members">%1$d membre.s actif.s</string>
     <string name="leaderboard">Classement</string>
     <string name="leave_group">Quitter le groupe</string>
     <string name="leave_group_question">Quitter le groupe ?</string>

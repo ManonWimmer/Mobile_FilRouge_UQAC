@@ -108,7 +108,7 @@ private fun DiscoverGroupCard(group: Group, onJoinClick: () -> Unit, modifier: M
 
             // Nbr de membres
             Text(
-                text = stringResource(R.string.active_members, {group?.memberCount ?: 0}),
+                text = stringResource(R.string.active_members, group.memberCount ?: 0),
                 color = GreenAccent,
                 style = MaterialTheme.typography.labelSmall
             )

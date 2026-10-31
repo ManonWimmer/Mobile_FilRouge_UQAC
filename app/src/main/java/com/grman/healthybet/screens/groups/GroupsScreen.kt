@@ -199,7 +199,7 @@ private fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Mo
 
                 // Nombre de membres
                 Text(
-                    text = stringResource(R.string.active_members, {group.memberCount ?: 0}),
+                    text = stringResource(R.string.active_members, group.memberCount ?: 0),
                     color = GraySubtitle,
                     style = MaterialTheme.typography.bodySmall
                 )

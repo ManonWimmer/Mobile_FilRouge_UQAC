@@ -76,7 +76,7 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = stringResource(R.string.active_members, {group?.memberCount ?: 0}),
+                    text = stringResource(R.string.active_members, group?.memberCount ?: 0),
                     color = GraySubtitle,
                     style = MaterialTheme.typography.bodySmall
                 )
