@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -69,7 +70,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             ) {
                 Image(painterResource(
                     id=R.drawable.cat),
-                    contentDescription = "cat",
+                    contentDescription = stringResource(R.string.logo_app_description),
                     modifier = Modifier.size(20.dp)
                 );
             }
@@ -78,7 +79,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
 
             // App name
             Text(
-                text = "Healthy Bet",
+                text = stringResource(R.string.app_name),
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -97,7 +98,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
 
             // Text 2
             Text(
-                text = "Rejoins l'arène et commence à te réveiller en forme",
+                text = stringResource(R.string.app_pitch_sign_up),
                 color = GraySubtitle,
                 fontSize = 14.sp, // todo: use type
                 textAlign = TextAlign.Center
@@ -129,7 +130,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             Spacer(modifier = Modifier.height(16.dp))
 
             // Pseudo
-            LabeledField(label = "Pseudo") {
+            LabeledField(label = stringResource(R.string.pseudo)) {
                 OutlinedTextField(
                     value = viewModel.pseudo,
                     onValueChange = { viewModel.pseudo = it },
@@ -137,14 +138,14 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("exemple de pseudo cool.tkt") }
+                    placeholder = { Text(stringResource(R.string.pseudo_example)) }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // EMail
-            LabeledField(label = "Adresse Email") {
+            LabeledField(label = stringResource(R.string.e_mail)) {
                 OutlinedTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
@@ -152,14 +153,14 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("jean.dupont@gmail.com") }
+                    placeholder = { Text(stringResource(R.string.e_mail_example)) }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Mot de passe
-            LabeledField(label = "Mot de passe") {
+            LabeledField(label = stringResource(R.string.password)) {
                 OutlinedTextField(
                     value = viewModel.password,
                     onValueChange = { viewModel.password = it },
@@ -167,7 +168,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("fitnesspro123") },
+                    placeholder = { Text(stringResource(R.string.password_example)) },
                    visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
@@ -175,7 +176,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LabeledField(label = "Confirmer le mot de passe") {
+            LabeledField(label = stringResource(R.string.password_confirm)) {
                 OutlinedTextField(
                     value = viewModel.confirmPassword,
                     onValueChange = { viewModel.confirmPassword = it },
@@ -183,7 +184,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("répète ton mot de passe") },
+                    placeholder = { Text(stringResource(R.string.password_confirm_example)) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
@@ -208,7 +209,7 @@ fun SignUpScreen(modifier: Modifier = Modifier,
                 if (viewModel.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Text("Créer mon compte", style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.create_account), style = MaterialTheme.typography.labelLarge)
                 }
             }
         }

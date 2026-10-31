@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +51,7 @@ import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.grman.healthybet.R
 
 data class FriendBet(
     val emoji: String,
@@ -64,15 +66,19 @@ fun HomeScreen(modifier: Modifier = Modifier,
                onSelectAlarmScreen : () -> Unit = {}) {
 
     val user = FirebaseAuth.getInstance().currentUser
-    val userName = user?.displayName ?: "Username introuvable"
-    var emoji by remember { mutableStateOf("😄") } // par défaut
+
+    val defaultUsername = stringResource(R.string.username_not_found)
+    var username by remember { mutableStateOf(user?.displayName ?: defaultUsername) }
+
+    val defaultEmoji = stringResource(R.string.default_emoji)
+    var emoji by remember { mutableStateOf(defaultEmoji) }
 
     // Get emoji
     LaunchedEffect(Unit) {
         val uid = user?.uid ?: return@LaunchedEffect
         FirebaseFirestore.getInstance().collection("members").document(uid).get()
             .addOnSuccessListener { doc ->
-                emoji = doc.getString("emoji") ?: "😄"
+                emoji = doc.getString("emoji") ?: defaultEmoji
             }
     }
 
@@ -92,7 +98,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
                 // Text salut!
                 Text(
-                    text = "Salut, $userName !",
+                    text = stringResource(R.string.greeting, username),
                     color = Color.White,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -109,7 +115,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
                     // Icon réveil
                     Icon(
                         imageVector = Icons.Filled.WatchLater,
-                        contentDescription = "Icon réveil",
+                        contentDescription = stringResource(R.string.alarm_icon_description),
                         tint = GreenAccent,
                         modifier = Modifier.size(16.dp)
                     )
@@ -118,13 +124,13 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
                     // Text réveil de demain
                     Text(
-                        text = "RÉVEIL DE DEMAIN",
+                        text = stringResource(R.string.alarm_tomorrow),
                         color = GreenAccent,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Text Temps restant
+                    // Text Temps restant todo avec bdd
                     Box(modifier = Modifier.background(GreenAccent.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 4.dp)) {
                         Text(
                             text = "- 08h 12m",
@@ -137,7 +143,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Heure du reveil
+                // Heure du reveil todo avec bdd
                 Text(
                     text = "06:30",
                     color = Color.White,
@@ -176,7 +182,7 @@ fun HomeScreen(modifier: Modifier = Modifier,
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
         ) {
             Text(
-                text = "+  Nouveau Réveil / Pari",
+                text = stringResource(R.string.alarm_new),
                 style = MaterialTheme.typography.labelLarge
             )
         }

@@ -1,10 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+    // Welcome screen
     <string name="app_name">HealthyBet</string>
     <string name="app_title">An alarm clock that really motivates.</string>
-    <string name="app_pitch">Take care of your body to prove to your friends that they’re wrong to doubt you. Accept the challenge or pay the penalty!</string>
+    <string name="app_pitch">Take care of your body and be better than your friends!</string>
 
     <string name="sign_up">Sign up</string>
     <string name="log_in">Log in</string>
+
+    // Home screen
+    <string name="username_not_found">Username not found</string>
+    <string name="default_emoji">😄</string>
+    <string name="greeting">Hi, %1$s!</string>
+    <string name="alarm_icon_description">Alarm icon</string>
+    <string name="alarm_tomorrow">TOMORROW\'S ALARM</string>
+    <string name="alarm_new">+  New Alarm</string>
+
+    // Profile screen
+    <string name="profile_title">Profile</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_succesful_alarms">Successful alarms</string>
+    <string name="log_out">Log out</string>
+
+    // Sign up screen
+    <string name="app_pitch_sign_up">Join the arena and start waking up fit</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="pseudo_example">Pseudo123</string>
+    <string name="e_mail">E-mail address</string>
+    <string name="e_mail_example">jean.dupont@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="password_example">healthy123</string>
+    <string name="password_confirm">Confirm the password</string>
+    <string name="password_confirm_example">Repeat your password</string>
+    <string name="create_account">Create my account</string>
+    <string name="logo_app_description">App icon</string>
+
+    // Connexion screen
+    <string name="connexion_greeting">Welcome back!</string>
+    <string name="app_pitch_connexion">Log in to beat your friends!</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="connect">Connect</string>
 </resources>

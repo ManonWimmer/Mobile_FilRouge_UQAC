@@ -1,10 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+    // Welcome screen
     <string name="app_name">HealthyBet</string>
     <string name="app_title">Un réveil qui motive vraiment.</string>
-    <string name="app_pitch">Prends soin de ton corps pour prouver à tes potes qu\'ils ont tort de douter de toi. Relève le défi ou paie le gage !</string>
+    <string name="app_pitch">Prends soin de ton corps et sois meilleur que tes potes !</string>
 
     <string name="sign_up">Inscription</string>
     <string name="log_in">Connexion</string>
+
+    // Home screen
+    <string name="username_not_found">Nom d\'utilisateur introuvable</string>
+    <string name="default_emoji">😄</string>
+    <string name="greeting">Salut, %1$s !</string>
+    <string name="alarm_icon_description">Icône de réveil</string>
+    <string name="alarm_tomorrow">ALARME DE DEMAIN</string>
+    <string name="alarm_new">+  Nouveau Réveil</string>
+
+    // Profile screen
+    <string name="profile_title">Profil</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_succesful_alarms">Alarmes réussies</string>
+    <string name="log_out">Se déconnecter</string>
+
+    // Sign up screen
+    <string name="app_pitch_sign_up">Rejoins l\'arène et commence à te réveiller en forme</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="pseudo_example">Pseudo123</string>
+    <string name="e_mail">Adresse e-mail</string>
+    <string name="e_mail_example">jean.dupont@gmail.com</string>
+    <string name="password">Mot de passe</string>
+    <string name="password_example">healthy123</string>
+    <string name="password_confirm">Confirmer le mot de passe</string>
+    <string name="password_confirm_example">Répète ton mot de passe</string>
+    <string name="create_account">Créer mon compte</string>
+    <string name="logo_app_description">Icône de l\'app</string>
+
+    // Connexion screen
+    <string name="connexion_greeting">Ravis de te revoir !</string>
+    <string name="app_pitch_connexion">Connecte-toi pour battre tes potes !</string>
+    <string name="forgot_password">Mot de passe oublié ?</string>
+    <string name="connect">Se connecter</string>
 </resources>

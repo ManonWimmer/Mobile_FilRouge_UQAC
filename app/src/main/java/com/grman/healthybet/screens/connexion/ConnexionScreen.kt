@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -69,7 +70,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
             ) {
                 Image(painterResource(
                     id= R.drawable.cat),
-                    contentDescription = "cat", // todo: change
+                    contentDescription = stringResource(R.string.logo_app_description),
                     modifier = Modifier.size(20.dp)
                 );
             }
@@ -78,7 +79,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             // App name
             Text(
-                text = "Healthy Bet",
+                text = stringResource(R.string.app_name),
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -87,7 +88,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             // Text 1
             Text(
-                text = "Ravis de te revoir !",
+                text = stringResource(R.string.connexion_greeting),
                 color = Color.White,
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
@@ -97,7 +98,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             // Text 2
             Text(
-                text = "Connecte-toi pour ne pas rater ton prochain pari",
+                text = stringResource(R.string.app_pitch_connexion),
                 color = GraySubtitle,
                 fontSize = 14.sp, // todo: use type
                 textAlign = TextAlign.Center
@@ -106,7 +107,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
             Spacer(modifier = Modifier.height(28.dp))
 
             // Email
-            LabeledField(label = "Adresse Email") {
+            LabeledField(label = stringResource(R.string.e_mail),) {
                 OutlinedTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
@@ -114,14 +115,14 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("jean.dupont@gmail.com") }
+                    placeholder = { Text(stringResource(R.string.e_mail_example),) }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Mot de passe
-            LabeledField(label = "Mot de passe") {
+            LabeledField(label = stringResource(R.string.password),) {
                 OutlinedTextField(
                     value = viewModel.password,
                     onValueChange = { viewModel.password = it },
@@ -129,7 +130,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                     shape = LittleRoundedCornerShape,
                     colors = fieldColors(),
                     singleLine = true,
-                    placeholder = { Text("fitnesspro123") },
+                    placeholder = { Text(stringResource(R.string.password_example),) },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 )
@@ -139,7 +140,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             // Mot de passe oublié
             Text( // todo: on click
-                text = "Mot de passe oublié ?",
+                text = stringResource(R.string.forgot_password),
                 color = GreenAccent,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
@@ -165,7 +166,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                 if (viewModel.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
                 } else {
-                    Text("Se connecter", style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.connect), style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
