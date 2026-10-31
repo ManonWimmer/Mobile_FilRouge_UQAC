@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.grman.healthybet.R
+import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -48,7 +49,8 @@ import com.grman.healthybet.viewmodels.ConnexionViewModel
 
 @Composable
 fun ConnexionScreen(modifier: Modifier = Modifier,
-                    onConnexionClick : () -> Unit = {}) {
+                    onConnexionClick : () -> Unit = {},
+                    onBackClick: () -> Unit = {}) {
 
     val viewModel : ConnexionViewModel = viewModel()
     var passwordVisible by remember { mutableStateOf(false) }
@@ -59,6 +61,13 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
+
+        // Bouton retour
+        BackButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)
+        )
+
         Column(modifier = Modifier.widthIn(min = 400.dp, max = 600.dp).align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
 
             // Logo

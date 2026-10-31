@@ -53,13 +53,15 @@ fun AppNavigation(modifier: Modifier = Modifier,
 
         composable(Routes.SIGNUP) {
             SignUpScreen(
-                onAccountCreationClick = { navController.navigate(Routes.HOME)}
+                onAccountCreationClick = { navController.navigate(Routes.HOME)},
+                onBackClick = { navController.popBackStack() }
             )
         }
 
         composable(Routes.LOGIN) {
             ConnexionScreen(
-                onConnexionClick = { navController.navigate(Routes.HOME)}
+                onConnexionClick = { navController.navigate(Routes.HOME)},
+                onBackClick = { navController.popBackStack() }
             )
         }
 
@@ -97,7 +99,7 @@ fun AppNavigation(modifier: Modifier = Modifier,
             GroupDetailScreen(
                 groupId = entry.arguments?.getString("groupId") ?: "",
                 viewModel = groupsViewModel,
-                onBack = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() }
             )
         }
 

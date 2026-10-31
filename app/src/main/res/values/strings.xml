@@ -77,4 +77,7 @@
     <string name="results">RESULTS</string>
     <string name="no_group_found">No groups found. Why not create your own?</string>
     <string name="join_group">Join</string>
+
+    // Others
+    <string name="back">Back</string>
 </resources>

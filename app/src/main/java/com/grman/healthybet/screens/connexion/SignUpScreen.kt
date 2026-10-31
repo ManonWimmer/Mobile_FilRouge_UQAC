@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.grman.healthybet.R
+import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -50,7 +51,8 @@ private val memberEmojis = listOf("\uD83D\uDE00", "\uD83D\uDE01️", "☺\uFE0F"
 
 @Composable
 fun SignUpScreen(modifier: Modifier = Modifier,
-                 onAccountCreationClick: () -> Unit = {}) {
+                 onAccountCreationClick: () -> Unit = {},
+                 onBackClick: () -> Unit = {}) {
 
     val viewModel : SignUpViewModel = viewModel()
 
@@ -59,6 +61,13 @@ fun SignUpScreen(modifier: Modifier = Modifier,
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
+
+        // Bouton retour
+        BackButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)
+        )
+
         Column(modifier = Modifier.widthIn(min = 400.dp, max = 600.dp).align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
 
             // Logo

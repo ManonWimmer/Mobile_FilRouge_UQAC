@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grman.healthybet.R
 import com.grman.healthybet.data.groups.GroupMember
+import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -57,7 +58,7 @@ import com.grman.healthybet.viewmodels.GroupsViewModel
 
 
 @Composable
-fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Modifier = Modifier, onBack: () -> Unit = {}) {
+fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Modifier = Modifier, onBackClick: () -> Unit = {}) {
     val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
     val isMember = viewModel.myGroups.any { it.id == groupId }
     var showLeaveDialog by remember { mutableStateOf(false) }
@@ -67,7 +68,10 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
         // Header
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
 
-            HeaderButton(icon = Icons.AutoMirrored.Filled.ArrowBack, description = "Retour", onClick = onBack)
+            // Bouton retour
+            BackButton(
+                onClick = onBackClick,
+            )
 
             // Nom du groupe + nombre de membres
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -135,7 +139,7 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
             confirmButton = {
                 TextButton(onClick = {
                     showLeaveDialog = false
-                    viewModel.leaveGroup(groupId, onSuccess = onBack)
+                    viewModel.leaveGroup(groupId, onSuccess = onBackClick)
                 }) {
                     Text(stringResource(R.string.quit), color = RedFail)
                 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.grman.healthybet.R
+import com.grman.healthybet.items.CloseButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -79,12 +80,7 @@ fun CreateGroupScreen(
             )
 
             // Bouton fermer
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = stringResource(R.string.close_icon_description),
-                tint = GraySubtitle,
-                modifier = Modifier.size(24.dp).clickable { onClose() }
-            )
+            CloseButton(onClick = onClose)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
