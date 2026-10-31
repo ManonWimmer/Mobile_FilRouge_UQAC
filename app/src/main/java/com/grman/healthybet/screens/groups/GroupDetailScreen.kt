@@ -39,9 +39,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.grman.healthybet.R
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -69,12 +71,12 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
             // Nom du groupe + nombre de membres
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "${group?.name ?: "Groupe"} ${group?.emoji ?: ""}",
+                    text = "${group?.name ?: stringResource(R.string.default_group_name)} ${group?.emoji ?: ""}",
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = "${group?.memberCount ?: 0} membres actifs",
+                    text = stringResource(R.string.active_members, {group?.memberCount ?: 0}),
                     color = GraySubtitle,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -84,7 +86,7 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
                 // Bouton quitter le groupe
                 HeaderButton(
                     icon = Icons.AutoMirrored.Filled.ExitToApp,
-                    description = "Quitter le groupe",
+                    description = stringResource(R.string.leave_group),
                     onClick = { showLeaveDialog = true }
                 )
             }
@@ -98,7 +100,7 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = "Classement", color = Color.White, style = MaterialTheme.typography.titleMedium)
+        Text(text = stringResource(R.string.leaderboard), color = Color.White, style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(12.dp))
 
         viewModel.groupMembers.forEachIndexed { index, member ->
@@ -111,19 +113,19 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
     if (showLeaveDialog) {
         AlertDialog(
             onDismissRequest = { showLeaveDialog = false },
-            title = { Text("Quitter le groupe ?") },
-            text = { Text("Tu ne verras plus ce groupe dans « Mes groupes ». Tu pourras le rejoindre à nouveau depuis Découvrir.") },
+            title = { Text(stringResource(R.string.leave_group_question)) },
+            text = { Text(stringResource(R.string.leave_group_description)) },
             confirmButton = {
                 TextButton(onClick = {
                     showLeaveDialog = false
                     viewModel.leaveGroup(groupId, onSuccess = onBack)
                 }) {
-                    Text("Quitter", color = RedFail)
+                    Text(stringResource(R.string.quit), color = RedFail)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLeaveDialog = false }) {
-                    Text("Annuler")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -185,7 +187,7 @@ private fun GroupAlarmCard() {
                 shape = LittleRoundedCornerShape,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
             ) {
-                Text(text = "Rejoindre l'alarme", style = MaterialTheme.typography.labelSmall)
+                Text(text = stringResource(R.string.join_alarm), style = MaterialTheme.typography.labelSmall)
             }
         }
     }

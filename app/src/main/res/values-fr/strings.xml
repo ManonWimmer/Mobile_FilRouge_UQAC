@@ -41,4 +41,40 @@
     <string name="app_pitch_connexion">Connecte-toi pour battre tes potes !</string>
     <string name="forgot_password">Mot de passe oublié ?</string>
     <string name="connect">Se connecter</string>
+
+    // Create groups screen
+    <string name="create_group">Créer un groupe</string>
+    <string name="close_icon_description">Icône fermer</string>
+    <string name="group_icon">ICÔNE DU GROUPE</string>
+    <string name="group_infos">INFORMATIONS</string>
+    <string name="group_name">Nom du groupe</string>
+    <string name="group_name_example">Les coureurs du matin</string>
+    <string name="group_description">Description (optionnelle)</string>
+    <string name="group_description_example">Réveil avant 6h, on se motive !</string>
+
+    // Group detail screen
+    <string name="default_group_name">Groupe</string>
+    <string name="active_members">%1$i membre.s actif.s</string>
+    <string name="leaderboard">Classement</string>
+    <string name="leave_group">Quitter le groupe</string>
+    <string name="leave_group_question">Quitter le groupe ?</string>
+    <string name="leave_group_description">Tu ne verras plus ce groupe dans « Mes groupes ». Tu pourras le rejoindre à nouveau depuis Découvrir.</string>
+    <string name="quit">Quitter</string>
+    <string name="cancel">Annuler</string>
+    <string name="join_alarm">Rejoindre l\'alarme</string>
+
+    // Groups screens
+    <string name="groups">Groupes</string>
+    <string name="my_groups">Mes groupes</string>
+    <string name="discover">Découvrir</string>
+    <string name="no_groups">Tu n\'as pas encore de groupe. Crée le tien ou rejoins-en un dans Découvrir !</string>
+    <string name="create_new_group">+  Créer un nouveau groupe</string>
+
+    // Search groups screen
+    <string name="search_group">Rechercher un groupe...</string>
+    <string name="search">Recherche</string>
+    <string name="all_groups">TOUS LES GROUPES</string>
+    <string name="results">RÉSULTATS</string>
+    <string name="no_group_found">Aucun groupe trouvé. Pourquoi ne pas créer le tien ?</string>
+    <string name="join_group">Rejoindre</string>
 </resources>

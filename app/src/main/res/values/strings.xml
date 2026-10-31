@@ -41,4 +41,40 @@
     <string name="app_pitch_connexion">Log in to beat your friends!</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="connect">Connect</string>
+
+    // Create groups screen
+    <string name="create_group">Créer le groupe</string>
+    <string name="close_icon_description">Close icon</string>
+    <string name="group_icon">GROUP ICON</string>
+    <string name="group_infos">INFORMATIONS</string>
+    <string name="group_name">Group name</string>
+    <string name="group_name_example">The morning runners</string>
+    <string name="group_description">Description (optional)</string>
+    <string name="group_description_example">Wake up before 6, let\'s motivate ourselves!</string>
+
+    // Group detail screen
+    <string name="default_group_name">Group</string>
+    <string name="active_members">%1$i active member.s</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="leave_group">Leave group</string>
+    <string name="leave_group_question">Leave group?</string>
+    <string name="leave_group_description">You will no longer see this group in "My groups." You can join it again from Discover.</string>
+    <string name="quit">Quit</string>
+    <string name="cancel">Cancel</string>
+    <string name="join_alarm">Join alarm</string>
+
+    // Groups screens
+    <string name="groups">Groups</string>
+    <string name="my_groups">My groups</string>
+    <string name="discover">Discover</string>
+    <string name="no_groups">You don’t have a group yet. Create your own or join one in Discover!</string>
+    <string name="create_new_group">+  Create new group</string>
+
+    // Search groups screen
+    <string name="search_group">Search for a group...</string>
+    <string name="search">Search</string>
+    <string name="all_groups">ALL GROUPS</string>
+    <string name="results">RESULTS</string>
+    <string name="no_group_found">No groups found. Why not create your own?</string>
+    <string name="join_group">Join</string>
 </resources>

@@ -24,9 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.grman.healthybet.R
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -47,11 +49,11 @@ fun SearchGroupContent(viewModel: GroupsViewModel, modifier: Modifier = Modifier
         GroupTextField(
             value = viewModel.searchQuery,
             onValueChange = { viewModel.searchQuery = it },
-            placeholder = "Rechercher un groupe...",
+            placeholder = stringResource(R.string.search_group),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Filled.Search,
-                    contentDescription = "Rechercher",
+                    contentDescription = stringResource(R.string.search),
                     tint = GrayLabel
                 )
             }
@@ -60,7 +62,7 @@ fun SearchGroupContent(viewModel: GroupsViewModel, modifier: Modifier = Modifier
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = if (viewModel.searchQuery.isBlank()) "TOUS LES GROUPES" else "RÉSULTATS",
+            text = if (viewModel.searchQuery.isBlank()) stringResource(R.string.all_groups) else stringResource(R.string.results),
             color = GraySubtitle,
             style = MaterialTheme.typography.labelMedium
         )
@@ -73,7 +75,7 @@ fun SearchGroupContent(viewModel: GroupsViewModel, modifier: Modifier = Modifier
             if (results.isEmpty()) {
                 item {
                     Text(
-                        text = "Aucun groupe trouvé. Pourquoi ne pas créer le tien ?",
+                        text = stringResource(R.string.no_group_found),
                         color = GraySubtitle,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
@@ -106,7 +108,7 @@ private fun DiscoverGroupCard(group: Group, onJoinClick: () -> Unit, modifier: M
 
             // Nbr de membres
             Text(
-                text = "${group.memberCount} membres",
+                text = stringResource(R.string.active_members, {group?.memberCount ?: 0}),
                 color = GreenAccent,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -131,7 +133,7 @@ private fun DiscoverGroupCard(group: Group, onJoinClick: () -> Unit, modifier: M
             shape = LittleRoundedCornerShape,
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
         ) {
-            Text(text = "Rejoindre", style = MaterialTheme.typography.labelSmall)
+            Text(text = stringResource(R.string.join_group), style = MaterialTheme.typography.labelSmall)
         }
     }
 }

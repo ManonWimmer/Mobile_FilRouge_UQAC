@@ -34,8 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.grman.healthybet.R
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -70,7 +72,7 @@ fun CreateGroupScreen(
         // Header
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Créer un Groupe",
+                text = stringResource(R.string.create_group),
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
@@ -79,7 +81,7 @@ fun CreateGroupScreen(
             // Bouton fermer
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Fermer",
+                contentDescription = stringResource(R.string.close_icon_description),
                 tint = GraySubtitle,
                 modifier = Modifier.size(24.dp).clickable { onClose() }
             )
@@ -89,7 +91,7 @@ fun CreateGroupScreen(
 
         // Icône du groupe
         Text(
-            text = "ICÔNE DU GROUPE",
+            text = stringResource(R.string.group_icon),
             color = GraySubtitle,
             style = MaterialTheme.typography.labelMedium
         )
@@ -127,7 +129,7 @@ fun CreateGroupScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "INFORMATIONS",
+                text = stringResource(R.string.group_infos),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -135,7 +137,7 @@ fun CreateGroupScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Nom du groupe",
+                text = stringResource(R.string.group_name),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -145,13 +147,13 @@ fun CreateGroupScreen(
             GroupTextField(
                 value = name,
                 onValueChange = { if (it.length <= 30) name = it },
-                placeholder = "Les runners du matin"
+                placeholder = stringResource(R.string.group_name_example),
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Description (optionnel)",
+                text = stringResource(R.string.group_description),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.bodySmall
             )
@@ -161,7 +163,7 @@ fun CreateGroupScreen(
             GroupTextField(
                 value = description,
                 onValueChange = { if (it.length <= 120) description = it },
-                placeholder = "Réveil avant 6h, on se motive !",
+                placeholder = stringResource(R.string.group_description_example),
                 singleLine = false
             )
         }
@@ -192,7 +194,7 @@ fun CreateGroupScreen(
             if (viewModel.isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp, color = Color.Black)
             } else {
-                Text(text = "Créer le groupe", style = MaterialTheme.typography.labelLarge)
+                Text(text = stringResource(R.string.create_group), style = MaterialTheme.typography.labelLarge)
             }
         }
     }
