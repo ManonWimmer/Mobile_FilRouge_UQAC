@@ -28,11 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.grman.healthybet.R
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -47,16 +49,20 @@ fun ProfileScreen(
     onLogout: () -> Unit = {}
 ) {
     val user = FirebaseAuth.getInstance().currentUser
-    var emoji by remember { mutableStateOf("😄") } // par défaut
-    var username by remember { mutableStateOf(user?.displayName ?: "Username introuvable") }
 
-    // Récupère emoji + pseudo dans members/{uid}
+    val defaultUsername = stringResource(R.string.username_not_found)
+    var username by remember { mutableStateOf(user?.displayName ?: defaultUsername) }
+
+    val defaultEmoji = stringResource(R.string.default_emoji)
+    var emoji by remember { mutableStateOf(defaultEmoji) }
+
+
+    // Récupère emoji
     LaunchedEffect(user?.uid) {
         val uid = user?.uid ?: return@LaunchedEffect
         FirebaseFirestore.getInstance().collection("members").document(uid).get()
             .addOnSuccessListener { doc ->
-                emoji = doc.getString("emoji") ?: "😄"
-                username = doc.getString("username") ?: username
+                emoji = doc.getString("emoji") ?: defaultEmoji
             }
     }
 
@@ -72,9 +78,9 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Titre
+        // Titre Profil
         Text(
-            text = "Profil",
+            text = stringResource(R.string.profile_title),
             color = Color.White,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.fillMaxWidth()
@@ -112,8 +118,8 @@ fun ProfileScreen(
 
         // Stats
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(value = "$points", label = "Points", modifier = Modifier.weight(1f))
-            StatCard(value = "$alarmsDone", label = "Réveils réussis", modifier = Modifier.weight(1f))
+            StatCard(value = "$points", label = stringResource(R.string.profile_points), modifier = Modifier.weight(1f))
+            StatCard(value = "$alarmsDone", label = stringResource(R.string.profile_succesful_alarms), modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -129,7 +135,7 @@ fun ProfileScreen(
             border = BorderStroke(1.dp, RedFail),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = RedFail)
         ) {
-            Text(text = "Se déconnecter", style = MaterialTheme.typography.labelLarge)
+            Text(text = stringResource(R.string.log_out), style = MaterialTheme.typography.labelLarge)
         }
     }
 }
