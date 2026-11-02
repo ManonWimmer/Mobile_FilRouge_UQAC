@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
 
@@ -21,9 +22,8 @@ class AlarmRingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setShowWhenLocked(true)
         setTurnScreenOn(true)
-
+        val alarmId = intent.getStringExtra("alarmId")
         val objective = intent.getStringExtra("objective").orEmpty()
-        val stake = intent.getStringExtra("stake").orEmpty()
 
         setContent {
             HealthyBetTheme {
@@ -35,7 +35,6 @@ class AlarmRingActivity : ComponentActivity() {
                     Text("⏰ Debout !", color = Color.White, style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
                     Spacer(Modifier.height(12.dp))
                     Text("Objectif : $objective", color = Color.White)
-                    Text("Enjeu : $stake", color = Color.White)
                     Spacer(Modifier.height(32.dp))
                     Button(
                         onClick = {
@@ -43,6 +42,7 @@ class AlarmRingActivity : ComponentActivity() {
                                 Intent(this@AlarmRingActivity, AlarmService::class.java)
                                     .setAction(AlarmService.ACTION_STOP)
                             )
+                            alarmId?.let { AlarmRepository.setEnabled(it, false) }
                             finish()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),

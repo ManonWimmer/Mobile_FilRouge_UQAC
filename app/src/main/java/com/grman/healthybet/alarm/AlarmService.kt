@@ -23,14 +23,13 @@ class AlarmService : Service() {
         }
 
         val objective = intent?.getStringExtra("objective").orEmpty()
-        val stake = intent?.getStringExtra("stake").orEmpty()
 
         createChannel()
 
         val ringIntent = Intent(this, AlarmRingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra("objective", objective)
-            putExtra("stake", stake)
+            putExtra("alarmId", intent?.getStringExtra("alarmId"))
         }
         val fullScreen = PendingIntent.getActivity(
             this, 0, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

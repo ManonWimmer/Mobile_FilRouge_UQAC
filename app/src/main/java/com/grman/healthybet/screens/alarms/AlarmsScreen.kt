@@ -17,6 +17,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +29,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.data.alarms.AlarmData
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -33,53 +40,63 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
+import kotlin.comparisons.compareBy
+
 
 @Composable
-fun AlarmsScreen(modifier: Modifier = Modifier){
+fun AlarmsScreen(modifier: Modifier = Modifier) {
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    var alarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
 
-    val alarms = listOf(
-        AlarmData(
-            "0",
-            6,
-            30,
-            "\uD83C\uDFC3 Courir 5km avant 07:15",
-            AlarmState.EN_COURS,
-            false,
-            true,
-        ),
-        AlarmData(
-            "0",
-            6,
-            30,
-            "\uD83C\uDFC3 Courir 5km avant 07:15",
-            AlarmState.FINIT,
-            true,
-            true,
-        )
-    )
-
-    Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)){
-
-        // Header
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-
-            Column(modifier = Modifier.weight(1f)){
-                // Text tes réveil
-                Text(
-                    text = "Tes Réveils",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+    // Démarre l'écoute quand l'écran apparaît, la coupe quand il disparaît
+    DisposableEffect(uid) {
+        val listener = uid?.let { id ->
+            AlarmRepository.observeUserAlarms(id) { result -> alarms = result }
         }
+        onDispose { listener?.remove() }
+    }
+
+    AlarmsContent(
+        alarms = alarms.sortedWith(compareBy({ it.hour }, { it.minute })),
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = "Tes Réveils",
+            color = Color.White,
+            style = MaterialTheme.typography.titleMedium
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Réveils
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            alarms.forEach { alarm ->
-                AlarmCard(alarmData = alarm, modifier = Modifier.then(if (!alarm.enabled) { Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape) } else { Modifier }))
+        if (alarms.isEmpty()) {
+            Text(
+                text = "Aucun réveil pour l'instant",
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                alarms.forEach { alarm ->
+                    AlarmCard(
+                        alarmData = alarm,
+                        modifier = if (alarm.enabled) {
+                            Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
+                        } else Modifier
+                    )
+                }
             }
         }
     }
@@ -93,7 +110,7 @@ private fun AlarmCard(alarmData: AlarmData, modifier: Modifier = Modifier) {
 
             // Alarm time
             Text(
-                text = alarmData.hour.toString() + " : " + alarmData.minute.toString(),
+                text = "%02d:%02d".format(alarmData.hour, alarmData.minute),
                 color = Color.White,
                 style = MaterialTheme.typography.displayMedium
             )
@@ -104,7 +121,11 @@ private fun AlarmCard(alarmData: AlarmData, modifier: Modifier = Modifier) {
             // Alarm status badge
             Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Text(
-                    text = alarmData.advancement.toString(),
+                    text = when (alarmData.state) {
+                        AlarmState.NONE -> "Programmé"
+                        AlarmState.EN_COURS -> "En cours"
+                        AlarmState.FINIT -> if (alarmData.success) "Réussi ✅" else "Raté ❌"
+                    },
                     color = if (alarmData.success) GreenAccent else RedFail,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center
@@ -139,6 +160,20 @@ private fun AlarmCard(alarmData: AlarmData, modifier: Modifier = Modifier) {
 @Composable
 fun AlarmsScreenPreview() {
     HealthyBetTheme {
-        AlarmsScreen()
+        AlarmsContent(
+            alarms = listOf(
+                AlarmData(
+                    id = "1", hour = 6, minute = 30,
+                    objective = "🏃 Courir 5km avant 07:15",
+                    advancement = AlarmState.EN_COURS.name
+                ),
+                AlarmData(
+                    id = "2", hour = 7, minute = 0,
+                    objective = "👟 8000 pas",
+                    advancement = AlarmState.FINIT.name,
+                    success = true
+                )
+            )
+        )
     }
 }

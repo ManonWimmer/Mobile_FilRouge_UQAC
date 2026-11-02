@@ -54,6 +54,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import com.grman.healthybet.alarm.AlarmScheduler
+import com.grman.healthybet.data.alarms.AlarmData
+import com.grman.healthybet.data.alarms.AlarmRepository
+import com.grman.healthybet.data.alarms.AlarmState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -82,25 +85,32 @@ fun CreateAlarmScreen(
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        //Planification
-        val trigger = AlarmScheduler.schedule(
-            context = context,
+        val alarm = AlarmData(
             hour = timeState.hour,
             minute = timeState.minute,
-            objective = target,
+            objective = target.toString(),
+            advancement = AlarmState.EN_COURS.name,
+            success = false,
+            enabled = true
         )
 
-        if (trigger == null) {
-            //Permission "alarmes exactes" manquante = ouvrir les parametres
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                context.startActivity(
-                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
-                )
+        AlarmRepository.create(alarm) { saved ->
+            if (saved == null) {
+                Toast.makeText(context, "Connecte-toi d'abord", Toast.LENGTH_SHORT).show()
+                return@create
             }
-            Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show()
-        } else {
-            val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger)) //J'ai aucune idée de ce que c'est ici
-            Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show()
+            val trigger = AlarmScheduler.schedule(context, saved)
+            if (trigger == null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    context.startActivity(
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+                    )
+                }
+                Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show()
+            } else {
+                val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger)) //J'ai aucune idée de ce que c'est ici
+                Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
