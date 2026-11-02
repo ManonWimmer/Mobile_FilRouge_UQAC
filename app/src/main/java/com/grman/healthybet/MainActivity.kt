@@ -12,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
+import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.items.BottomNavBar
 import com.grman.healthybet.items.BottomNavItem
 import com.grman.healthybet.ui.theme.HealthyBetTheme
@@ -21,6 +23,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate")
+
+        var lastUid: String? = "__init__"
+
+        //FireBase Check a l'init de l'app pour recup tout comme il faut
+        FirebaseAuth.getInstance().addAuthStateListener { auth ->
+            val uid = auth.currentUser?.uid
+            if (uid != lastUid) {
+                lastUid = uid
+                AlarmSync.sync(this, uid)
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             HealthyBetTheme {

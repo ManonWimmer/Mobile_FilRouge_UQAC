@@ -122,7 +122,7 @@ fun ProfileScreen(
         OutlinedButton(
             onClick = {
                 FirebaseAuth.getInstance().signOut() // deco firebase
-                onLogout() // retour welcome screejn
+                onLogout() // retour welcome screen
             },
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = LittleRoundedCornerShape,

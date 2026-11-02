@@ -48,4 +48,17 @@ object AlarmRepository {
                 onResult(snap?.toObjects(AlarmData::class.java).orEmpty())
             }
     }
+
+    /* Lecture unique des alarmes active d'un utilisateur (pour les programmer) */
+    fun getEnabledAlarms(userId: String, onResult: (List<AlarmData>) -> Unit) {
+        collection
+            .whereEqualTo("ownerId", userId)
+            .whereEqualTo("enabled", true)
+            .get()
+            .addOnSuccessListener { onResult(it.toObjects(AlarmData::class.java)) }
+            .addOnFailureListener {
+                Log.e(TAG, "Échec getEnabledAlarms", it)
+                onResult(emptyList())
+            }
+    }
 }
