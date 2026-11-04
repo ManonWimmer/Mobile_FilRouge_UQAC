@@ -10,17 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -44,6 +40,7 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -59,18 +56,22 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.grman.healthybet.R
 import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
-import com.grman.healthybet.data.alarms.RoundStepGoal
-import com.grman.healthybet.data.alarms.FormatDuration
+import com.grman.healthybet.data.alarms.roundStepGoal
+import com.grman.healthybet.data.alarms.formatDuration
+import com.grman.healthybet.items.CloseButton
 import com.grman.healthybet.viewmodels.GroupsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 
+@SuppressLint("LocalContextGetResourceValueCall") // warning relou à l'utilisation de string resource au toast make test
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class) // pour rememberTimePickerState
 @Composable
 fun CreateAlarmScreen(
@@ -96,6 +97,12 @@ fun CreateAlarmScreen(
     var stepGoal by remember { mutableFloatStateOf(5000f) }
     var durationMinutes by remember { mutableFloatStateOf(60f) }
 
+    // Recuperation des textes (pas possible dans programmer qui n'est pas Composable)
+    val loginFirst = stringResource(R.string.login_first)
+    val allowExactAlarms = stringResource(R.string.allow_exact_alarms)
+    val scheduledTemplate = stringResource(R.string.alarm_scheduled)
+
+    @SuppressLint("LocalContextGetResourceValueCall")
     fun programmer() {
         if (selectedGroupId.isBlank())
             return
@@ -105,7 +112,7 @@ fun CreateAlarmScreen(
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
-        val steps = RoundStepGoal(stepGoal.toInt()); // Arrondir à 500 pcq des fois c 499
+        val steps = roundStepGoal(stepGoal.toInt()); // Arrondir à 500 pcq des fois c 499
         val minutes = durationMinutes.toInt()
 
         val alarm = AlarmData(
@@ -125,7 +132,7 @@ fun CreateAlarmScreen(
 
         AlarmRepository.create(alarm) { saved ->
             if (saved == null) {
-                Toast.makeText(context, "Connecte-toi d'abord", Toast.LENGTH_SHORT).show() // todo: strings.xml
+                Toast.makeText(context, loginFirst, Toast.LENGTH_SHORT).show()
                 return@create
             }
             val trigger = AlarmScheduler.schedule(context, saved)
@@ -135,10 +142,10 @@ fun CreateAlarmScreen(
                         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
                     )
                 }
-                Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show() // todo: strings.xml
+                Toast.makeText(context, allowExactAlarms, Toast.LENGTH_LONG).show()
             } else {
-                val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger))  // todo: strings.xml
-                Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show() // todo: strings.xml
+                val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger))
+                Toast.makeText(context, scheduledTemplate.format(heure), Toast.LENGTH_SHORT).show()
                 onClose()
             }
         }
@@ -154,21 +161,14 @@ fun CreateAlarmScreen(
         // Header
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Créer un Réveil", // todo: strings.xml
+                text = stringResource(R.string.create_alarm),
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
 
             // Bouton fermer
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Fermer", // todo: strings.xml
-                tint = GraySubtitle,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { onClose() }
-            )
+            CloseButton(onClick = onClose)
         }
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -178,7 +178,7 @@ fun CreateAlarmScreen(
 
             // Text heure du reveil
             Text(
-                text = "HEURE DU RÉVEIL",  // todo: strings.xml
+                text = stringResource(R.string.alarm_hour),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.align(Alignment.Start)
@@ -204,13 +204,13 @@ fun CreateAlarmScreen(
         Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "NOMBRE DE PAS", // todo : strings.xml
+                    text = stringResource(R.string.step_goal),
                     color = GraySubtitle,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = "%,d".format(Locale.FRANCE, stepGoal.toInt()), // todo : strings.xml
+                    text = stringResource(R.string.step_goal_value, roundStepGoal(stepGoal.toInt())),
                     color = GreenAccent,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -236,13 +236,13 @@ fun CreateAlarmScreen(
         Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "TEMPS POUR LE FAIRE", // todo : strings.xml
+                    text = stringResource(R.string.alarm_duration),
                     color = GraySubtitle,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = FormatDuration(durationMinutes.toInt()),
+                    text = formatDuration(LocalContext.current, durationMinutes.toInt()),
                     color = GreenAccent,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -264,12 +264,17 @@ fun CreateAlarmScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // Sélection du groupe
-        Text(text = "Groupe", color = GraySubtitle, style = MaterialTheme.typography.bodySmall) // todo: strings.xml
+        Text(
+            text = stringResource(R.string.group),
+            color = GraySubtitle,
+            style = MaterialTheme.typography.bodySmall
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         if (groupsViewModel.myGroups.isEmpty()) {
             Text(
-                text = "Rejoins ou crée un groupe pour pouvoir programmer un réveil.", // todo: strings.xml
+                text = stringResource(R.string.join_group_alarm),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -280,7 +285,7 @@ fun CreateAlarmScreen(
             ) {
                 groupsViewModel.myGroups.forEach { group ->
                     GroupChip(
-                        label = "${group.emoji} ${group.name}",
+                        label = stringResource(R.string.group_label, group.emoji, group.name),
                         selected = selectedGroupId == group.id,
                         onClick = { selectedGroupId = group.id }
                     )
@@ -299,7 +304,7 @@ fun CreateAlarmScreen(
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent, disabledContainerColor = GreenAccent.copy(alpha = 0.3f))
         ) {
             Text(
-                text = "Programmer mon réveil \u23F0", // todo: strings.xml
+                text = stringResource(R.string.set_alarm),
                 style = MaterialTheme.typography.labelLarge
             )
         }

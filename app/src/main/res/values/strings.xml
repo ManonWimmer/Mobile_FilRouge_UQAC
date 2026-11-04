@@ -83,7 +83,7 @@
 
     // Alarms
     <string name="group_alarms">Group\'s alarms</string>
-    <string name="create_alarm">Create</string>
+    <string name="create_alarm">Create alarm</string>
     <string name="no_group_alarm">No alarm for this group</string>
     <string name="registered_count">%1$d registered</string>
     <string name="leave_alarm">Leave alarm</string>
@@ -96,4 +96,33 @@
     <string name="alarm_in_progress">In progress</string>
     <string name="alarm_success">Success ✅</string>
     <string name="alarm_fail">Fail ❌</string>
+
+    // Create alarm screen
+    <string name="login_first">Log in first</string>
+    <string name="allow_exact_alarms">Allows exact alarms and then retries</string>
+    <string name="alarm_scheduled">Alarm scheduled: %1$s</string>
+    <string name="close">Close</string>
+    <string name="alarm_hour">ALARM TIME</string>
+    <string name="step_goal">STEP GOAL</string>
+    <string name="step_goal_value">%,d</string>
+    <string name="alarm_duration">TIME TO ACHIEVE</string>
+    <string name="group">Group</string>
+    <string name="join_group_alarm">Join or create a group to be able to schedule an alarm</string>
+    <string name="group_label">%1$s %2$s</string>
+    <string name="set_alarm">Set the alarm ⏰</string>
+    <string name="alarm_objective">👟 %,d steps in %s</string>
+    <string name="duration_minutes">%1$dmin</string>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$dh%2$02d</string>
+    <string name="time_hours_minutes">%1$02d : %2$02d</string>
+
+    // Alarm ring activity
+    <string name="ring_wake_up">⏰ Wake up!</string>
+    <string name="objective_description">Objective: %1$s</string>
+    <string name="ring_stop">Ring stop</string>
+
+    // Alarm service
+    <string name="alarm_notif_title">⏰ Réveil HealthyBet</string>
+    <string name="alarm_channel_name">Réveil</string>
+
 </resources>

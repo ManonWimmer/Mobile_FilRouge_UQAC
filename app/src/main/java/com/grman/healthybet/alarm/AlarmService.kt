@@ -8,7 +8,8 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.*
 import androidx.core.app.NotificationCompat
-import com.grman.healthybet.data.alarms.GetObjectiveText
+import com.grman.healthybet.R
+import com.grman.healthybet.data.alarms.objectiveText
 
 class AlarmService : Service() {
 
@@ -23,11 +24,8 @@ class AlarmService : Service() {
             return START_NOT_STICKY
         }
 
-        val stepGoal = intent?.getStringExtra("stepGoal")
-        val stepGoalInt: Int = stepGoal?.toInt() ?: 0
-
-        val durationMinutes = intent?.getStringExtra("durationMinutes")
-        val durationMinutesInt: Int = durationMinutes?.toInt() ?: 0
+        val stepGoal = intent?.getIntExtra("stepGoal", 0) ?: 0
+        val durationMinutes = intent?.getIntExtra("durationMinutes", 0) ?: 0
 
         createChannel()
 
@@ -44,8 +42,8 @@ class AlarmService : Service() {
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("⏰ Réveil HealthyBet") // todo : strings.xml
-            .setContentText("Objectif : ${GetObjectiveText(stepGoalInt, durationMinutesInt)}") // todo : strings.xml
+            .setContentTitle(getString(R.string.alarm_notif_title))
+            .setContentText(getString(R.string.objective_description, objectiveText(this, stepGoal, durationMinutes)))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(fullScreen, true)
@@ -89,7 +87,7 @@ class AlarmService : Service() {
 
     private fun createChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID, "Réveil", NotificationManager.IMPORTANCE_HIGH
+            CHANNEL_ID, getString(R.string.alarm_channel_name), NotificationManager.IMPORTANCE_HIGH
         ).apply { setSound(null, null) } // le son est géré par le MediaPlayer
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }

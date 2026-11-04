@@ -1,6 +1,10 @@
 package com.grman.healthybet.data.alarms
 
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.google.firebase.firestore.Exclude
+import com.grman.healthybet.R
 import kotlin.math.roundToInt
 
 data class AlarmData(
@@ -32,25 +36,27 @@ enum class AlarmState{
     DONE
 }
 
-public fun GetObjectiveText(stepGoal: Int, durationMinutes: Int): String
-{
+public fun objectiveText(context: Context, stepGoal: Int, durationMinutes: Int): String =
     if (stepGoal > 0 && durationMinutes > 0)
-        return "👟 %,d pas en %s".format(java.util.Locale.FRANCE, RoundStepGoal(stepGoal), FormatDuration(durationMinutes)) // todo: strings.xml
+        context.getString(
+            R.string.alarm_objective,
+            roundStepGoal(stepGoal),
+            formatDuration(context, durationMinutes)
+        )
     else
-        return ""
-}
+        ""
 
-fun FormatDuration(minutes: Int): String {
+fun formatDuration(context: Context, minutes: Int): String {
     val h = minutes / 60
     val m = minutes % 60
     return when {
-        h == 0 -> "${m}min"
-        m == 0 -> "${h}h"
-        else -> "$h h %02d".format(m)
+        h == 0 -> context.getString(R.string.duration_minutes, m)
+        m == 0 -> context.getString(R.string.duration_hours, h)
+        else -> context.getString(R.string.duration_hours_minutes, h, m)
     }
 }
 
-public fun RoundStepGoal(stepGoal: Int): Int {
+public fun roundStepGoal(stepGoal: Int): Int {
     return (stepGoal / 500f).roundToInt() * 500;
 }
 

@@ -1,9 +1,7 @@
 package com.grman.healthybet.screens.groups
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,15 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -50,7 +45,7 @@ import com.grman.healthybet.R
 import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
-import com.grman.healthybet.data.alarms.GetObjectiveText
+import com.grman.healthybet.data.alarms.objectiveText
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
@@ -254,7 +249,7 @@ private fun GroupAlarmCard(
             )
 
             Text(
-                text = "%02d:%02d".format(alarm.hour, alarm.minute),
+                text = stringResource(R.string.time_hours_minutes, alarm.hour, alarm.minute),
                 color = GreenAccent,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -263,7 +258,7 @@ private fun GroupAlarmCard(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Objectif
-        Text(text = GetObjectiveText(alarm.stepGoal, alarm.durationMinutes), color = Color.White, style = MaterialTheme.typography.bodyMedium)
+        Text(text = objectiveText(LocalContext.current, alarm.stepGoal, alarm.durationMinutes), color = Color.White, style = MaterialTheme.typography.bodyMedium)
 
         Spacer(modifier = Modifier.height(10.dp))
 

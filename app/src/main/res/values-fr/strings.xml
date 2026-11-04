@@ -83,7 +83,7 @@
 
     // Alarms
     <string name="group_alarms">Réveils du groupe</string>
-    <string name="create_alarm">Créer</string>
+    <string name="create_alarm">Créer un réveil</string>
     <string name="no_group_alarm">Aucun réveil pour ce groupe</string>
     <string name="registered_count">%1$d inscrit.s</string>
     <string name="leave_alarm">Se désinscrire</string>
@@ -96,4 +96,33 @@
     <string name="alarm_in_progress">En cours</string>
     <string name="alarm_success">Réussi ✅</string>
     <string name="alarm_fail">Raté ❌</string>
+
+    // Create alarm screen
+    <string name="login_first">Connecte-toi d\'abord</string>
+    <string name="allow_exact_alarms">Autorise les alarmes exactes puis réessaie</string>
+    <string name="alarm_scheduled">Réveil programmé : %1$s</string>
+    <string name="close">Fermer</string>
+    <string name="alarm_hour">HEURE DU RÉVEIL</string>
+    <string name="step_goal">OBJECTIF DE PAS</string>
+    <string name="step_goal_value">%,d</string>
+    <string name="alarm_duration">TEMPS POUR L\'ATTEINDRE</string>
+    <string name="group">Groupe</string>
+    <string name="join_group_alarm">Rejoins ou crée un groupe pour pouvoir programmer un réveil</string>
+    <string name="group_label">%1$s %2$s</string>
+    <string name="set_alarm">Programmer le réveil ⏰</string>
+    <string name="alarm_objective">👟 %,d pas en %s</string>
+    <string name="duration_minutes">%1$dmin</string>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$02dh%2$02d</string>
+    <string name="time_hours_minutes">%1$02d : %2$02d</string>
+
+    // Alarm ring activity
+    <string name="ring_wake_up">⏰ Debout !</string>
+    <string name="objective_description">Objectif : %1$s</string>
+    <string name="ring_stop">Arrêter le réveil</string>
+
+    // Alarm service
+    <string name="alarm_notif_title">⏰ HealthyBet Alarm</string>
+    <string name="alarm_channel_name">Alarm</string>
+
 </resources>

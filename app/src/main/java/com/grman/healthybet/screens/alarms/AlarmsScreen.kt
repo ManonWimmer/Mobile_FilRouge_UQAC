@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +37,7 @@ import com.grman.healthybet.R
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
-import com.grman.healthybet.data.alarms.GetObjectiveText
+import com.grman.healthybet.data.alarms.objectiveText
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -155,7 +156,7 @@ private fun AlarmCard(alarmData: AlarmData,
 
         // Text Objectif réveil
         Text(
-            text = GetObjectiveText(alarmData.stepGoal, alarmData.durationMinutes),
+            text = objectiveText(LocalContext.current, alarmData.stepGoal, alarmData.durationMinutes),
             color = GraySubtitle,
             style = MaterialTheme.typography.bodyMedium
         )

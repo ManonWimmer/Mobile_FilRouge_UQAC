@@ -17,14 +17,25 @@ import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
+import androidx.compose.material3.MaterialTheme
+import com.grman.healthybet.R
+import com.grman.healthybet.data.alarms.objectiveText
 
 class AlarmRingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setShowWhenLocked(true)
         setTurnScreenOn(true)
+
         val alarmId = intent.getStringExtra("alarmId")
-        val objective = intent.getStringExtra("objective").orEmpty()
+        val stepGoal = intent.getIntExtra("stepGoal", 0)
+        val durationMinutes = intent.getIntExtra("durationMinutes", 0)
+
+        // Textes
+        val title = getString(R.string.ring_wake_up)
+        val objective = getString(R.string.objective_description, objectiveText(this, stepGoal, durationMinutes))
+        val stopLabel = getString(R.string.ring_stop)
 
         setContent {
             HealthyBetTheme {
@@ -33,10 +44,21 @@ class AlarmRingActivity : ComponentActivity() {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("⏰ Debout !", color = Color.White, style = androidx.compose.material3.MaterialTheme.typography.headlineLarge) // todo : strings.xml
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineLarge
+                    )
+
                     Spacer(Modifier.height(12.dp))
-                    Text("Objectif : $objective", color = Color.White) // todo : strings.xml
+
+                    Text(
+                        text = objective,
+                        color = Color.White
+                    )
+
                     Spacer(Modifier.height(32.dp))
+
                     Button(
                         onClick = {
                             startService(
@@ -48,7 +70,11 @@ class AlarmRingActivity : ComponentActivity() {
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),
                         modifier = Modifier.fillMaxWidth().height(56.dp)
-                    ) { Text("Arrêter le réveil") } // todo : strings.xml
+                    ) {
+                        Text(
+                            text = stopLabel
+                        )
+                    }
                 }
             }
         }
