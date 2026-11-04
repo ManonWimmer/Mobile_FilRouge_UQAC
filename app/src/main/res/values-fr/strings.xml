@@ -87,4 +87,13 @@
     <string name="no_group_alarm">Aucun réveil pour ce groupe</string>
     <string name="registered_count">%1$d inscrit.s</string>
     <string name="leave_alarm">Se désinscrire</string>
+
+    // Alarms screen
+    <string name="your_alarms">Tes réveils</string>
+    <string name="no_alarms">Pas de réveils pour l\'instant</string>
+    <string name="alarm_time">%1$02d : %2$02d</string>
+    <string name="alarm_none">Programmé</string>
+    <string name="alarm_in_progress">En cours</string>
+    <string name="alarm_success">Réussi ✅</string>
+    <string name="alarm_fail">Raté ❌</string>
 </resources>

@@ -28,8 +28,8 @@ data class AlarmData(
 
 enum class AlarmState{
     NONE,
-    EN_COURS,
-    FINIT
+    IN_PROGRESS,
+    DONE
 }
 
 public fun GetObjectiveText(stepGoal: Int, durationMinutes: Int): String
@@ -44,8 +44,8 @@ fun FormatDuration(minutes: Int): String {
     val h = minutes / 60
     val m = minutes % 60
     return when {
-        h == 0 -> "$m min"
-        m == 0 -> "$h h"
+        h == 0 -> "${m}min"
+        m == 0 -> "${h}h"
         else -> "$h h %02d".format(m)
     }
 }

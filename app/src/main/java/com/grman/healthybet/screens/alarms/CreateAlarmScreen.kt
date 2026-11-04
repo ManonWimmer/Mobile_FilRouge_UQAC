@@ -44,7 +44,6 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.HighRoundedCornerShape
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import android.Manifest
-import android.app.AlarmManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -118,7 +117,7 @@ fun CreateAlarmScreen(
             stepGoal = steps,
             durationMinutes = minutes,
 
-            advancement = AlarmState.EN_COURS.name,
+            advancement = AlarmState.IN_PROGRESS.name,
 
             success = false,
             enabled = true

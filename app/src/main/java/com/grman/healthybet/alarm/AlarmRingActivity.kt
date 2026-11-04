@@ -33,9 +33,9 @@ class AlarmRingActivity : ComponentActivity() {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("⏰ Debout !", color = Color.White, style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
+                    Text("⏰ Debout !", color = Color.White, style = androidx.compose.material3.MaterialTheme.typography.headlineLarge) // todo : strings.xml
                     Spacer(Modifier.height(12.dp))
-                    Text("Objectif : $objective", color = Color.White)
+                    Text("Objectif : $objective", color = Color.White) // todo : strings.xml
                     Spacer(Modifier.height(32.dp))
                     Button(
                         onClick = {
@@ -48,7 +48,7 @@ class AlarmRingActivity : ComponentActivity() {
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),
                         modifier = Modifier.fillMaxWidth().height(56.dp)
-                    ) { Text("Arrêter le réveil") }
+                    ) { Text("Arrêter le réveil") } // todo : strings.xml
                 }
             }
         }

@@ -87,4 +87,13 @@
     <string name="no_group_alarm">No alarm for this group</string>
     <string name="registered_count">%1$d registered</string>
     <string name="leave_alarm">Leave alarm</string>
+
+    // Alarms screen
+    <string name="your_alarms">Your alarms</string>
+    <string name="no_alarms">Zero alarms for the moment</string>
+    <string name="alarm_time">%1$02d : %2$02d</string>
+    <string name="alarm_none">Programmed</string>
+    <string name="alarm_in_progress">In progress</string>
+    <string name="alarm_success">Success ✅</string>
+    <string name="alarm_fail">Fail ❌</string>
 </resources>

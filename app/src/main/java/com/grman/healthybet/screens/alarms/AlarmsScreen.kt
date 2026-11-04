@@ -26,11 +26,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.grman.healthybet.R
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
@@ -74,17 +76,22 @@ private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
+
+        // Text tes réveils
         Text(
-            text = "Tes Réveils",
+            text = stringResource(R.string.your_alarms),
             color = Color.White,
             style = MaterialTheme.typography.titleMedium
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
+
         if (alarms.isEmpty()) {
+
+            // Pas de réveils
             Text(
-                text = "Aucun réveil pour l'instant",
+                text = stringResource(R.string.no_alarms),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -121,7 +128,7 @@ private fun AlarmCard(alarmData: AlarmData,
 
             // Alarm time
             Text(
-                text = "%02d:%02d".format(alarmData.hour, alarmData.minute),
+                text = stringResource(R.string.alarm_time, alarmData.hour, alarmData.minute),
                 color = Color.White,
                 style = MaterialTheme.typography.displayMedium
             )
@@ -133,9 +140,9 @@ private fun AlarmCard(alarmData: AlarmData,
             Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Text(
                     text = when (alarmData.state) {
-                        AlarmState.NONE -> "Programmé" // todo: strings.xml
-                        AlarmState.EN_COURS -> "En cours" // todo: strings.xml
-                        AlarmState.FINIT -> if (alarmData.success) "Réussi ✅" else "Raté ❌" // todo: strings.xml
+                        AlarmState.NONE -> stringResource(R.string.alarm_none)
+                        AlarmState.IN_PROGRESS -> stringResource(R.string.alarm_in_progress)
+                        AlarmState.DONE -> if (alarmData.success) stringResource(R.string.alarm_success) else stringResource(R.string.alarm_fail)
                     },
                     color = if (alarmData.success) GreenAccent else RedFail,
                     style = MaterialTheme.typography.labelSmall,
@@ -175,13 +182,13 @@ fun AlarmsScreenPreview() {
                 AlarmData(
                     id = "1", hour = 6, minute = 30,
                     stepGoal = 5000, durationMinutes = 45,
-                    advancement = AlarmState.EN_COURS.name,
+                    advancement = AlarmState.IN_PROGRESS.name,
                     enabled = true
                 ),
                 AlarmData(
                     id = "2", hour = 7, minute = 0,
                     stepGoal = 8000, durationMinutes = 90,
-                    advancement = AlarmState.FINIT.name,
+                    advancement = AlarmState.DONE.name,
                     success = true,
                     enabled = false
                 )

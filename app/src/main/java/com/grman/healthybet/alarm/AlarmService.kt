@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.*
 import androidx.core.app.NotificationCompat
+import com.grman.healthybet.data.alarms.GetObjectiveText
 
 class AlarmService : Service() {
 
@@ -22,13 +23,19 @@ class AlarmService : Service() {
             return START_NOT_STICKY
         }
 
-        val objective = intent?.getStringExtra("objective").orEmpty()
+        val stepGoal = intent?.getStringExtra("stepGoal")
+        val stepGoalInt: Int = stepGoal?.toInt() ?: 0
+
+        val durationMinutes = intent?.getStringExtra("durationMinutes")
+        val durationMinutesInt: Int = durationMinutes?.toInt() ?: 0
 
         createChannel()
 
         val ringIntent = Intent(this, AlarmRingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            putExtra("objective", objective)
+            //putExtra("objective", objective)
+            putExtra("stepGoal", stepGoal)
+            putExtra("durationMinutes", durationMinutes)
             putExtra("alarmId", intent?.getStringExtra("alarmId"))
         }
         val fullScreen = PendingIntent.getActivity(
@@ -37,8 +44,8 @@ class AlarmService : Service() {
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("⏰ Réveil HealthyBet")
-            .setContentText("Objectif : $objective")
+            .setContentTitle("⏰ Réveil HealthyBet") // todo : strings.xml
+            .setContentText("Objectif : ${GetObjectiveText(stepGoalInt, durationMinutesInt)}") // todo : strings.xml
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setFullScreenIntent(fullScreen, true)

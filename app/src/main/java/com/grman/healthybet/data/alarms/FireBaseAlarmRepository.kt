@@ -85,14 +85,8 @@ object AlarmRepository {
             .addOnFailureListener { Log.e(TAG, "Échec leave", it) }
     }
 
-    // Quand quelqu'un arrête la sonnerie
     fun onAlarmStopped(alarmId: String, uid: String?) {
-        collection.document(alarmId).get().addOnSuccessListener { doc ->
-            if (uid == null || doc.getString("ownerId") == uid) {
-                setEnabled(alarmId, false)   // le créateur désactive pour tout le monde
-            } else {
-                leave(alarmId, uid)          // un participant ne se retire que lui-même
-            }
-        }
+        if (uid == null) return
+        leave(alarmId, uid);
     }
 }
