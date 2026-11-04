@@ -62,6 +62,8 @@ import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
 import com.grman.healthybet.viewmodels.GroupsViewModel
+import androidx.compose.ui.platform.LocalInspectionMode
+
 
 
 @Composable
@@ -73,7 +75,8 @@ fun GroupDetailScreen(
     onCreateAlarmClick: (String) -> Unit = {}) {
 
     val context = LocalContext.current
-    val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val isPreview = LocalInspectionMode.current
+    val uid = if (isPreview) null else FirebaseAuth.getInstance().currentUser?.uid
 
     val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
     val isMember = viewModel.myGroups.any { it.id == groupId }
@@ -84,6 +87,7 @@ fun GroupDetailScreen(
     // Alarmes du groupe en temps réel
     var groupAlarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
     DisposableEffect(groupId) {
+        if (isPreview) return@DisposableEffect onDispose {}
         val listener = AlarmRepository.observeGroupAlarms(groupId) { groupAlarms = it }
         onDispose { listener.remove() }
     }
