@@ -62,6 +62,10 @@
     <string name="quit">Quit</string>
     <string name="cancel">Cancel</string>
     <string name="join_alarm">Join alarm</string>
+    <string name="delete">Delete</string>
+    <string name="delete_alarm">Delete alarm</string>
+    <string name="delete_alarm_question">Delete this alarm?</string>
+    <string name="delete_alarm_description">It will be deleted for all participants.</string>
 
     // Groups screens
     <string name="groups">Groups</string>

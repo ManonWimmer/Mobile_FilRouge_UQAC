@@ -1,5 +1,6 @@
 package com.grman.healthybet.screens.groups
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
+import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
@@ -72,7 +75,9 @@ fun GroupDetailScreen(
 
     val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
     val isMember = viewModel.myGroups.any { it.id == groupId }
+
     var showLeaveDialog by remember { mutableStateOf(false) }
+    var alarmToDelete by remember { mutableStateOf<AlarmData?>(null) }
 
     // Alarmes du groupe en temps réel
     var groupAlarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
@@ -170,6 +175,8 @@ fun GroupDetailScreen(
                     participantEmojis = participants.joinToString("") { it.emoji },
                     participantCount = alarm.participantIds.size,
                     joined = joined,
+                    isOwner = uid != null && alarm.ownerId == uid,
+                    onDelete = { alarmToDelete = alarm },
                     onToggleJoin = {
                         if (uid != null) {
                             if (joined) AlarmRepository.leave(alarm.id, uid)
@@ -216,6 +223,28 @@ fun GroupDetailScreen(
             }
         )
     }
+
+    alarmToDelete?.let { alarm ->
+        AlertDialog(
+            onDismissRequest = { alarmToDelete = null },
+            title = { Text(stringResource(R.string.delete_alarm_question)) },
+            text = { Text(stringResource(R.string.delete_alarm_description)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    AlarmRepository.delete(alarm.id)
+                    AlarmScheduler.cancel(context, alarm.id) // annule la sonnerie sur ce téléphone
+                    alarmToDelete = null
+                }) {
+                    Text(stringResource(R.string.delete), color = RedFail)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { alarmToDelete = null }) {
+                    Text(stringResource(R.string.cancel)) // todo: faire cancel pour tous les autres inscrits
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -225,6 +254,8 @@ private fun GroupAlarmCard(
     ownerEmoji: String,
     participantEmojis: String,
     participantCount: Int,
+    isOwner: Boolean,
+    onDelete: () -> Unit,
     joined: Boolean,
     onToggleJoin: () -> Unit
 ) {
@@ -275,6 +306,7 @@ private fun GroupAlarmCard(
 
         Spacer(modifier = Modifier.height(14.dp))
 
+        // Joindre / Quitter
         Button(
             onClick = onToggleJoin,
             modifier = Modifier.fillMaxWidth().height(44.dp),
@@ -285,6 +317,23 @@ private fun GroupAlarmCard(
                 text = stringResource(if (joined) R.string.leave_alarm else R.string.join_alarm),
                 style = MaterialTheme.typography.labelSmall
             )
+        }
+
+        // Suppression : réservée au créateur
+        if (isOwner) {
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onDelete,
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                shape = LittleRoundedCornerShape,
+                border = BorderStroke(1.dp, RedFail),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = RedFail)
+            ) {
+                Text(
+                    text = stringResource(R.string.delete_alarm),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
         }
     }
 }

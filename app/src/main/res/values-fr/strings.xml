@@ -62,6 +62,10 @@
     <string name="quit">Quitter</string>
     <string name="cancel">Annuler</string>
     <string name="join_alarm">Rejoindre l\'alarme</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_alarm">Supprimer le réveil</string>
+    <string name="delete_alarm_question">Supprimer ce réveil ?</string>
+    <string name="delete_alarm_description">Il sera supprimé pour tous les inscrits.</string>
 
     // Groups screens
     <string name="groups">Groupes</string>
