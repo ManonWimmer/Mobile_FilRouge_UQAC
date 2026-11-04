@@ -121,7 +121,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun WelcomescreenPreview() {
     HealthyBetTheme {
