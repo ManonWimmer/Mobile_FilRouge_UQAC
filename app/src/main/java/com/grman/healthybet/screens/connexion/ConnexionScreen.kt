@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.grman.healthybet.R
+import com.grman.healthybet.data.auth.AuthRepository
 import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
@@ -50,9 +51,9 @@ import com.grman.healthybet.viewmodels.ConnexionViewModel
 @Composable
 fun ConnexionScreen(modifier: Modifier = Modifier,
                     onConnexionClick : () -> Unit = {},
-                    onBackClick: () -> Unit = {}) {
+                    onBackClick: () -> Unit = {},
+                    viewModel: ConnexionViewModel = viewModel()) {
 
-    val viewModel : ConnexionViewModel = viewModel()
     var passwordVisible by remember { mutableStateOf(false) }
 
 
@@ -78,9 +79,9 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
                 contentAlignment = Alignment.Center
             ) {
                 Image(painterResource(
-                    id= R.drawable.cat),
+                    id= R.drawable.logo),
                     contentDescription = stringResource(R.string.logo_app_description),
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(40.dp)
                 );
             }
 
@@ -182,11 +183,17 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun ConnexionScreenPreview() {
+    val fakeRepo = object : AuthRepository {
+        override suspend fun signIn(email: String, password: String) {}
+        override suspend fun sendPasswordReset(email: String) {}
+        override suspend fun signUp(email: String, password: String, pseudo: String, emoji: String) {}
+    }
+
     HealthyBetTheme {
-        ConnexionScreen()
+        ConnexionScreen(viewModel = ConnexionViewModel(fakeRepo))
     }
 }
 
