@@ -289,7 +289,7 @@ internal fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = M
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun GroupsScreenPreview() {
     val fakeRepo = object : GroupRepository {

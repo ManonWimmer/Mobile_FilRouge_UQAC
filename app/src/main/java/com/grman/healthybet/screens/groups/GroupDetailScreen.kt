@@ -369,7 +369,7 @@ private fun MemberRow(rank: Int, member: GroupMember) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun GroupDetailScreenPreview() {
     val fakeRepo = object : GroupRepository {
