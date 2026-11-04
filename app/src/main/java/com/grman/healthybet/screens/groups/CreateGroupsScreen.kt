@@ -38,6 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.grman.healthybet.R
+import com.grman.healthybet.data.auth.AuthRepository
+import com.grman.healthybet.data.groups.GroupMember
+import com.grman.healthybet.data.groups.GroupRepository
+import com.grman.healthybet.data.groups.GroupsOverview
 import com.grman.healthybet.items.CloseButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
@@ -230,10 +234,24 @@ internal fun GroupTextField(
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun CreateGroupScreenPreview() {
+
+    val fakeRepo = object : GroupRepository {
+        override suspend fun getGroups(): GroupsOverview {
+            TODO("Retourner un GroupsOverview de test")
+        }
+        override suspend fun createGroup(name: String, emoji: String, description: String) {}
+
+        override suspend fun joinGroup(groupId: String) {}
+
+        override suspend fun leaveGroup(groupId: String) {}
+
+        override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
+    }
+
     HealthyBetTheme {
-        CreateGroupScreen(viewModel = GroupsViewModel())
+        CreateGroupScreen(viewModel = GroupsViewModel(fakeRepo))
     }
 }
