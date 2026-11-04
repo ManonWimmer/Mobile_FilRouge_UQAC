@@ -66,6 +66,9 @@ import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.data.alarms.roundStepGoal
 import com.grman.healthybet.data.alarms.formatDuration
+import com.grman.healthybet.data.groups.GroupMember
+import com.grman.healthybet.data.groups.GroupRepository
+import com.grman.healthybet.data.groups.GroupsOverview
 import com.grman.healthybet.data.health.StepsReader
 import com.grman.healthybet.items.CloseButton
 import com.grman.healthybet.viewmodels.GroupsViewModel
@@ -269,12 +272,14 @@ fun CreateAlarmScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // Sélection du groupe
-        Text(
-            text = stringResource(R.string.group),
-            color = GraySubtitle,
-            style = MaterialTheme.typography.bodySmall
-        )
 
+        if (selectedGroupId == ""){
+            Text(
+                text = stringResource(R.string.group),
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
 
         if (groupsViewModel.myGroups.isEmpty()) {
@@ -284,16 +289,18 @@ fun CreateAlarmScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
         } else {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                groupsViewModel.myGroups.forEach { group ->
-                    GroupChip(
-                        label = stringResource(R.string.group_label, group.emoji, group.name),
-                        selected = selectedGroupId == group.id,
-                        onClick = { selectedGroupId = group.id }
-                    )
+            if (selectedGroupId == ""){
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    groupsViewModel.myGroups.forEach { group ->
+                        GroupChip(
+                            label = stringResource(R.string.group_label, group.emoji, group.name),
+                            selected = selectedGroupId == group.id,
+                            onClick = { selectedGroupId = group.id }
+                        )
+                    }
                 }
             }
         }
@@ -359,7 +366,20 @@ private fun AlarmTextField(value: String, onValueChange: (String) -> Unit, place
 @Preview(showBackground = true)
 @Composable
 fun CreateAlarmScreenPreview() {
+    val fakeRepo = object : GroupRepository {
+        override suspend fun getGroups(): GroupsOverview {
+            TODO("Retourner un GroupsOverview de test")
+        }
+        override suspend fun createGroup(name: String, emoji: String, description: String) {}
+
+        override suspend fun joinGroup(groupId: String) {}
+
+        override suspend fun leaveGroup(groupId: String) {}
+
+        override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
+    }
+
     HealthyBetTheme {
-        CreateAlarmScreen(groupsViewModel = GroupsViewModel())
+        CreateAlarmScreen(groupsViewModel = GroupsViewModel(fakeRepo))
     }
 }
