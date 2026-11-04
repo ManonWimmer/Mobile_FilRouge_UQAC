@@ -50,6 +50,7 @@ import com.grman.healthybet.R
 import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
+import com.grman.healthybet.data.alarms.GetObjectiveText
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
@@ -262,7 +263,7 @@ private fun GroupAlarmCard(
         Spacer(modifier = Modifier.height(10.dp))
 
         // Objectif
-        Text(text = alarm.objective, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+        Text(text = GetObjectiveText(alarm.stepGoal, alarm.durationMinutes), color = Color.White, style = MaterialTheme.typography.bodyMedium)
 
         Spacer(modifier = Modifier.height(10.dp))
 

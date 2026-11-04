@@ -34,6 +34,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
+import com.grman.healthybet.data.alarms.GetObjectiveText
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -132,9 +133,9 @@ private fun AlarmCard(alarmData: AlarmData,
             Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Text(
                     text = when (alarmData.state) {
-                        AlarmState.NONE -> "Programmé"
-                        AlarmState.EN_COURS -> "En cours"
-                        AlarmState.FINIT -> if (alarmData.success) "Réussi ✅" else "Raté ❌"
+                        AlarmState.NONE -> "Programmé" // todo: strings.xml
+                        AlarmState.EN_COURS -> "En cours" // todo: strings.xml
+                        AlarmState.FINIT -> if (alarmData.success) "Réussi ✅" else "Raté ❌" // todo: strings.xml
                     },
                     color = if (alarmData.success) GreenAccent else RedFail,
                     style = MaterialTheme.typography.labelSmall,
@@ -147,7 +148,7 @@ private fun AlarmCard(alarmData: AlarmData,
 
         // Text Objectif réveil
         Text(
-            text = alarmData.objective,
+            text = GetObjectiveText(alarmData.stepGoal, alarmData.durationMinutes),
             color = GraySubtitle,
             style = MaterialTheme.typography.bodyMedium
         )
@@ -165,7 +166,6 @@ private fun AlarmCard(alarmData: AlarmData,
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun AlarmsScreenPreview() {
@@ -174,14 +174,16 @@ fun AlarmsScreenPreview() {
             alarms = listOf(
                 AlarmData(
                     id = "1", hour = 6, minute = 30,
-                    objective = "🏃 Courir 5km avant 07:15",
-                    advancement = AlarmState.EN_COURS.name
+                    stepGoal = 5000, durationMinutes = 45,
+                    advancement = AlarmState.EN_COURS.name,
+                    enabled = true
                 ),
                 AlarmData(
                     id = "2", hour = 7, minute = 0,
-                    objective = "👟 8000 pas",
+                    stepGoal = 8000, durationMinutes = 90,
                     advancement = AlarmState.FINIT.name,
-                    success = true
+                    success = true,
+                    enabled = false
                 )
             )
         )

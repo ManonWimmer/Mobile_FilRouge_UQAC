@@ -45,7 +45,8 @@ object AlarmScheduler {
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarmId", alarm.id)
-            putExtra("objective", alarm.objective)
+            putExtra("stepGoal", alarm.stepGoal)
+            putExtra("durationMinutes", alarm.durationMinutes)
         }
         val requestCode = alarm.id.hashCode()
         val operation = PendingIntent.getBroadcast(

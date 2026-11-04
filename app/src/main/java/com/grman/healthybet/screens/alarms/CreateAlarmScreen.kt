@@ -55,12 +55,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.platform.LocalContext
 import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
+import com.grman.healthybet.data.alarms.RoundStepGoal
+import com.grman.healthybet.data.alarms.FormatDuration
 import com.grman.healthybet.viewmodels.GroupsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -89,7 +94,8 @@ fun CreateAlarmScreen(
     // todo: lier à un ViewModel
 
     val timeState = rememberTimePickerState(initialHour = 6, initialMinute = 30, is24Hour = true)
-    var target by remember { mutableStateOf("") }
+    var stepGoal by remember { mutableFloatStateOf(5000f) }
+    var durationMinutes by remember { mutableFloatStateOf(60f) }
 
     fun programmer() {
         if (selectedGroupId.isBlank())
@@ -100,13 +106,18 @@ fun CreateAlarmScreen(
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
+        val steps = RoundStepGoal(stepGoal.toInt()); // Arrondir à 500 pcq des fois c 499
+        val minutes = durationMinutes.toInt()
+
         val alarm = AlarmData(
             groupId = selectedGroupId,
 
             hour = timeState.hour,
             minute = timeState.minute,
 
-            objective = target.toString(),
+            stepGoal = steps,
+            durationMinutes = minutes,
+
             advancement = AlarmState.EN_COURS.name,
 
             success = false,
@@ -115,7 +126,7 @@ fun CreateAlarmScreen(
 
         AlarmRepository.create(alarm) { saved ->
             if (saved == null) {
-                Toast.makeText(context, "Connecte-toi d'abord", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Connecte-toi d'abord", Toast.LENGTH_SHORT).show() // todo: strings.xml
                 return@create
             }
             val trigger = AlarmScheduler.schedule(context, saved)
@@ -125,10 +136,10 @@ fun CreateAlarmScreen(
                         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
                     )
                 }
-                Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Autorise les alarmes exactes puis réessaie", Toast.LENGTH_LONG).show() // todo: strings.xml
             } else {
-                val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger)) //J'ai aucune idée de ce que c'est ici
-                Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show()
+                val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger))  // todo: strings.xml
+                Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show() // todo: strings.xml
                 onClose()
             }
         }
@@ -144,7 +155,7 @@ fun CreateAlarmScreen(
         // Header
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "Créer un Réveil",
+                text = "Créer un Réveil", // todo: strings.xml
                 color = Color.White,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
@@ -153,7 +164,7 @@ fun CreateAlarmScreen(
             // Bouton fermer
             Icon(
                 imageVector = Icons.Filled.Close,
-                contentDescription = "Fermer",
+                contentDescription = "Fermer", // todo: strings.xml
                 tint = GraySubtitle,
                 modifier = Modifier
                     .size(24.dp)
@@ -168,7 +179,7 @@ fun CreateAlarmScreen(
 
             // Text heure du reveil
             Text(
-                text = "HEURE DU RÉVEIL",
+                text = "HEURE DU RÉVEIL",  // todo: strings.xml
                 color = GraySubtitle,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.align(Alignment.Start)
@@ -190,31 +201,76 @@ fun CreateAlarmScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Text Valeur cible & heure limite
-        Text(
-            text = "Heure limite",
-            color = GraySubtitle,
-            style = MaterialTheme.typography.bodySmall
-        )
+        // Nombre de pas
+        Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "NOMBRE DE PAS", // todo : strings.xml
+                    color = GraySubtitle,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "%,d".format(Locale.FRANCE, stepGoal.toInt()), // todo : strings.xml
+                    color = GreenAccent,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            // Slider sélection pas
+            Slider(
+                value = stepGoal,
+                onValueChange = { stepGoal = it },
+                valueRange = 1000f..20000f, // 1 000 à 20 000 pas
+                steps = 37, // paliers de 500 pas
+                colors = SliderDefaults.colors(
+                    thumbColor = GreenAccent,
+                    activeTrackColor = GreenAccent,
+                    inactiveTrackColor = Color.White.copy(alpha = 0.1f)
+                )
+            )
+        }
 
-        // To do : heure sélectionnable plus facilement
-        AlarmTextField(
-            value = target,
-            onValueChange = { target = it },
-            placeholder = "5 000 pas avant 07:15"
-        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Temps pour y arriver
+        Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "TEMPS POUR LE FAIRE", // todo : strings.xml
+                    color = GraySubtitle,
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = FormatDuration(durationMinutes.toInt()),
+                    color = GreenAccent,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Slider(
+                value = durationMinutes,
+                onValueChange = { durationMinutes = it },
+                valueRange = 60f..1440f, // 1h -> 24h
+                steps = 23, // paliers de 1h
+                colors = SliderDefaults.colors(
+                    thumbColor = GreenAccent,
+                    activeTrackColor = GreenAccent,
+                    inactiveTrackColor = Color.White.copy(alpha = 0.1f)
+                )
+            )
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Sélection du groupe
-        Text(text = "Groupe", color = GraySubtitle, style = MaterialTheme.typography.bodySmall)
+        Text(text = "Groupe", color = GraySubtitle, style = MaterialTheme.typography.bodySmall) // todo: strings.xml
         Spacer(modifier = Modifier.height(8.dp))
 
         if (groupsViewModel.myGroups.isEmpty()) {
             Text(
-                text = "Rejoins ou crée un groupe pour pouvoir programmer un réveil.",
+                text = "Rejoins ou crée un groupe pour pouvoir programmer un réveil.", // todo: strings.xml
                 color = GraySubtitle,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -238,13 +294,13 @@ fun CreateAlarmScreen(
         // Bouton programmer réveil
         Button(
             onClick = { programmer() },
-            enabled = selectedGroupId.isNotBlank() && target.isNotBlank(),
+            enabled = selectedGroupId.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = LittleRoundedCornerShape,
             colors = ButtonDefaults.buttonColors(containerColor = GreenAccent, disabledContainerColor = GreenAccent.copy(alpha = 0.3f))
         ) {
             Text(
-                text = "Programmer mon réveil \u23F0",
+                text = "Programmer mon réveil \u23F0", // todo: strings.xml
                 style = MaterialTheme.typography.labelLarge
             )
         }
