@@ -65,7 +65,7 @@ class AlarmRingActivity : ComponentActivity() {
                                 Intent(this@AlarmRingActivity, AlarmService::class.java)
                                     .setAction(AlarmService.ACTION_STOP)
                             )
-                            alarmId?.let { AlarmRepository.onAlarmStopped(it, FirebaseAuth.getInstance().currentUser?.uid) }
+                            //alarmId?.let { AlarmRepository.onAlarmStopped(it, FirebaseAuth.getInstance().currentUser?.uid) }
                             finish()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),

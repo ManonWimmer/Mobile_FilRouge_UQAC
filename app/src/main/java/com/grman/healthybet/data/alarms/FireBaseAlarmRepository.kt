@@ -6,6 +6,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.grman.healthybet.data.health.HealthDebug
 
 object AlarmRepository {
     private const val TAG = "AlarmRepository"
@@ -85,8 +86,34 @@ object AlarmRepository {
             .addOnFailureListener { Log.e(TAG, "Échec leave", it) }
     }
 
+    /*
     fun onAlarmStopped(alarmId: String, uid: String?) {
         if (uid == null) return
         leave(alarmId, uid);
+    }
+    */
+
+    // Appelé quand la sonnerie démarre : enregistre l'heure de départ du suivi
+    fun startTracking(alarmId: String, uid: String, startedAt: Long) {
+        HealthDebug.debug("startTracking alarm=$alarmId uid=$uid startedAt=$startedAt")
+
+        collection.document(alarmId).update("results.$uid", AlarmResult(startedAt = startedAt))
+            .addOnSuccessListener { HealthDebug.debug("startTracking OK") }
+            .addOnFailureListener { HealthDebug.error("startTracking failed", it) }
+    }
+
+    // Met à jour les pas, statut et si fini
+    fun saveProgress(alarmId: String, uid: String, steps: Int, success: Boolean, finished: Boolean) {
+        HealthDebug.debug("saveProgress alarm=$alarmId steps=$steps success=$success finished=$finished")
+
+        collection.document(alarmId).update(
+            mapOf(
+                "results.$uid.steps" to steps,
+                "results.$uid.success" to success,
+                "results.$uid.finished" to finished
+            )
+        )
+            .addOnSuccessListener { HealthDebug.debug("saveProgress OK") }
+            .addOnFailureListener { HealthDebug.error("saveProgress failed", it) }
     }
 }

@@ -19,9 +19,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,9 @@ import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.data.alarms.objectiveText
+import com.grman.healthybet.data.health.HealthDebug
+import com.grman.healthybet.data.health.StepsReader
+import com.grman.healthybet.data.health.refreshProgress
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -45,6 +50,7 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
+import kotlinx.coroutines.delay
 import kotlin.comparisons.compareBy
 
 
@@ -52,14 +58,35 @@ import kotlin.comparisons.compareBy
 fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit = {}) {
 
     val uid = FirebaseAuth.getInstance().currentUser?.uid
+    val appContext = LocalContext.current.applicationContext
     var alarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
+    var debugText by remember { mutableStateOf("") }
+    val currentAlarms by rememberUpdatedState(alarms)
 
     // Démarre l'écoute quand l'écran apparaît, la coupe quand il disparaît
     DisposableEffect(uid) {
         val listener = uid?.let { id ->
-            AlarmRepository.observeUserAlarms(id) { result -> alarms = result }
+            AlarmRepository.observeUserAlarms(id) { result ->
+                HealthDebug.debug("observeUserAlarms -> ${result.size} alarmes")
+                alarms = result
+            }
         }
         onDispose { listener?.remove() }
+    }
+
+    // Debug + progression en continu tant que l'écran est visible
+    // todo: voir en background pour envoyer notif
+    LaunchedEffect(uid) {
+        if (uid == null) return@LaunchedEffect
+        while (true) {
+            if (HealthDebug.ENABLED) debugText = StepsReader.debugSnapshot(appContext)
+
+            currentAlarms
+                .filter { it.results[uid]?.finished == false }
+                .forEach { refreshProgress(appContext, it, uid) }
+
+            delay(HealthDebug.POLL_MS)
+        }
     }
 
     AlarmsContent(

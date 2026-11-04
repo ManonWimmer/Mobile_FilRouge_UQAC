@@ -23,12 +23,21 @@ data class AlarmData(
     val durationMinutes: Int = 0, // temps
 
     val success: Boolean = false,
-    val enabled: Boolean = true
+    val enabled: Boolean = true,
+
+    val results: Map<String, AlarmResult> = emptyMap(), // uid -> résultat
 ) {
     @get:Exclude
     val state: AlarmState
         get() = runCatching { AlarmState.valueOf(advancement) }.getOrDefault(AlarmState.NONE)
 }
+
+data class AlarmResult(
+    val startedAt: Long = 0L,      // ms : moment où la sonnerie a démarré
+    val steps: Int = 0,
+    val success: Boolean = false,
+    val finished: Boolean = false  // objectif atteint ou délai écoulé
+)
 
 enum class AlarmState{
     NONE,

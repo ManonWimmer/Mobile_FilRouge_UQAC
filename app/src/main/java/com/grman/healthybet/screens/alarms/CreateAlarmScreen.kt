@@ -57,6 +57,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import com.grman.healthybet.R
 import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.data.alarms.AlarmData
@@ -64,6 +66,7 @@ import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.data.alarms.roundStepGoal
 import com.grman.healthybet.data.alarms.formatDuration
+import com.grman.healthybet.data.health.StepsReader
 import com.grman.healthybet.items.CloseButton
 import com.grman.healthybet.viewmodels.GroupsViewModel
 import java.text.SimpleDateFormat
@@ -83,7 +86,9 @@ fun CreateAlarmScreen(
     val context = LocalContext.current
 
     // Charge mes groupes
-    LaunchedEffect(Unit) { groupsViewModel.loadGroups() }
+    LaunchedEffect(Unit) {
+        groupsViewModel.loadGroups()
+    }
 
     var selectedGroupId by remember { mutableStateOf(initialGroupId) }
 

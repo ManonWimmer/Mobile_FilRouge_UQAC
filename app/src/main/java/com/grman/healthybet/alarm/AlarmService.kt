@@ -8,8 +8,11 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.*
 import androidx.core.app.NotificationCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.objectiveText
+import com.grman.healthybet.data.health.HealthDebug
 
 class AlarmService : Service() {
 
@@ -36,6 +39,19 @@ class AlarmService : Service() {
             putExtra("durationMinutes", durationMinutes)
             putExtra("alarmId", intent?.getStringExtra("alarmId"))
         }
+
+        // Debug
+        val alarmId = intent?.getStringExtra("alarmId")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        HealthDebug.debug("Sonnerie déclenchée alarm=$alarmId uid=$uid stepGoal=$stepGoal duration=${durationMinutes}min")
+
+        // Suivi pour health connect
+        if (alarmId != null && uid != null) {
+            AlarmRepository.startTracking(alarmId, uid, System.currentTimeMillis())
+        } else {
+            HealthDebug.error("Suivi NON démarré : alarmId ou uid null")
+        }
+
         val fullScreen = PendingIntent.getActivity(
             this, 0, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

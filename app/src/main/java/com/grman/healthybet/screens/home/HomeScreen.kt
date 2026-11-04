@@ -1,5 +1,6 @@
 package com.grman.healthybet.screens.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,11 +37,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.RedFail
@@ -52,6 +56,7 @@ import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grman.healthybet.R
+import com.grman.healthybet.data.health.StepsReader
 
 data class FriendBet(
     val emoji: String,
@@ -65,6 +70,8 @@ fun HomeScreen(modifier: Modifier = Modifier,
                onCreateAlarmClick : () -> Unit = {},
                onSelectAlarmScreen : () -> Unit = {}) {
 
+    val appContext = LocalContext.current.applicationContext
+
     val user = FirebaseAuth.getInstance().currentUser
 
     val defaultUsername = stringResource(R.string.username_not_found)
@@ -73,13 +80,26 @@ fun HomeScreen(modifier: Modifier = Modifier,
     val defaultEmoji = stringResource(R.string.default_emoji)
     var emoji by remember { mutableStateOf(defaultEmoji) }
 
-    // Get emoji
+    // Health connect permission
+    val healthPermissionLauncher = rememberLauncherForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { /* refus : les pas ne seront pas comptés */ }
+
+    // Get emoji + setup stead reader
     LaunchedEffect(Unit) {
         val uid = user?.uid ?: return@LaunchedEffect
         FirebaseFirestore.getInstance().collection("members").document(uid).get()
             .addOnSuccessListener { doc ->
                 emoji = doc.getString("emoji") ?: defaultEmoji
             }
+
+        if (StepsReader.isAvailable(appContext)) {
+            val granted = HealthConnectClient.getOrCreate(appContext).permissionController.getGrantedPermissions()
+
+            if (!granted.containsAll(StepsReader.permissions)) {
+                healthPermissionLauncher.launch(StepsReader.permissions)
+            }
+        }
     }
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)){
