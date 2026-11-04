@@ -51,9 +51,9 @@ fun WelcomeScreen(modifier: Modifier = Modifier,
                 contentAlignment = Alignment.Center
             ) {
                 Image(painterResource(
-                    id=R.drawable.cat),
+                    id=R.drawable.logo),
                     contentDescription = "Logo",
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(40.dp)
                 );
             }
 
