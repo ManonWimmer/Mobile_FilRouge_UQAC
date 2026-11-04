@@ -50,6 +50,8 @@ import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.objectiveText
 import com.grman.healthybet.data.groups.GroupMember
+import com.grman.healthybet.data.groups.GroupRepository
+import com.grman.healthybet.data.groups.GroupsOverview
 import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -366,7 +368,20 @@ private fun MemberRow(rank: Int, member: GroupMember) {
 @Preview(showBackground = true)
 @Composable
 fun GroupDetailScreenPreview() {
+    val fakeRepo = object : GroupRepository {
+        override suspend fun getGroups(): GroupsOverview {
+            TODO("Retourner un GroupsOverview de test")
+        }
+        override suspend fun createGroup(name: String, emoji: String, description: String) {}
+
+        override suspend fun joinGroup(groupId: String) {}
+
+        override suspend fun leaveGroup(groupId: String) {}
+
+        override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
+    }
+
     HealthyBetTheme {
-        GroupDetailScreen(groupId = "", viewModel = GroupsViewModel())
+        GroupDetailScreen(groupId = "", viewModel = GroupsViewModel(fakeRepo))
     }
 }

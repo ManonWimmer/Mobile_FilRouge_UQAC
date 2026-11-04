@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grman.healthybet.R
 import com.grman.healthybet.data.groups.Group
+import com.grman.healthybet.data.groups.GroupMember
+import com.grman.healthybet.data.groups.GroupRepository
+import com.grman.healthybet.data.groups.GroupsOverview
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GrayLabel
 import com.grman.healthybet.ui.theme.GraySubtitle
@@ -289,7 +292,20 @@ internal fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = M
 @Preview(showBackground = true)
 @Composable
 fun GroupsScreenPreview() {
+    val fakeRepo = object : GroupRepository {
+        override suspend fun getGroups(): GroupsOverview {
+            TODO("Retourner un GroupsOverview de test")
+        }
+        override suspend fun createGroup(name: String, emoji: String, description: String) {}
+
+        override suspend fun joinGroup(groupId: String) {}
+
+        override suspend fun leaveGroup(groupId: String) {}
+
+        override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
+    }
+
     HealthyBetTheme {
-        GroupsScreen(viewModel = GroupsViewModel())
+        GroupsScreen(viewModel = GroupsViewModel(fakeRepo))
     }
 }
