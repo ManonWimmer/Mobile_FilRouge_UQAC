@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,11 +40,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
+import com.grman.healthybet.alarm.AlarmSync
+import com.grman.healthybet.data.alarms.AlarmData
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.items.BackButton
 import com.grman.healthybet.ui.theme.FieldBg
@@ -58,10 +64,26 @@ import com.grman.healthybet.viewmodels.GroupsViewModel
 
 
 @Composable
-fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Modifier = Modifier, onBackClick: () -> Unit = {}) {
+fun GroupDetailScreen(
+    groupId: String,
+    viewModel: GroupsViewModel,
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {},
+    onCreateAlarmClick: (String) -> Unit = {}) {
+
+    val context = LocalContext.current
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+
     val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
     val isMember = viewModel.myGroups.any { it.id == groupId }
     var showLeaveDialog by remember { mutableStateOf(false) }
+
+    // Alarmes du groupe en temps réel
+    var groupAlarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
+    DisposableEffect(groupId) {
+        val listener = AlarmRepository.observeGroupAlarms(groupId) { groupAlarms = it }
+        onDispose { listener.remove() }
+    }
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)) {
 
@@ -114,7 +136,54 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
 
         // Afficher alarms si membre du groupe
         if (isMember) {
-            GroupAlarmCard()
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.group_alarms),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Button(
+                    onClick = { onCreateAlarmClick(groupId) },
+                    shape = LittleRoundedCornerShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
+                ) {
+                    Text(stringResource(R.string.create_alarm), style = MaterialTheme.typography.labelSmall)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (groupAlarms.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_group_alarm),
+                    color = GraySubtitle,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            groupAlarms.sortedWith(compareBy({ it.hour }, { it.minute })).forEach { alarm ->
+                val joined = uid != null && uid in alarm.participantIds
+                val owner = viewModel.groupMembers.find { it.id == alarm.ownerId }
+                val participants = viewModel.groupMembers.filter { it.id in alarm.participantIds }
+
+                GroupAlarmCard(
+                    alarm = alarm,
+                    ownerName = owner?.username.orEmpty(),
+                    ownerEmoji = owner?.emoji ?: "🤔",
+                    participantEmojis = participants.joinToString("") { it.emoji },
+                    participantCount = alarm.participantIds.size,
+                    joined = joined,
+                    onToggleJoin = {
+                        if (uid != null) {
+                            if (joined) AlarmRepository.leave(alarm.id, uid)
+                            else AlarmRepository.join(alarm.id, uid)
+                            AlarmSync.sync(context, uid)
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
 
         LaunchedEffect(groupId) { viewModel.loadGroupMembers(groupId) } // Get group members
@@ -153,6 +222,77 @@ fun GroupDetailScreen(groupId: String, viewModel: GroupsViewModel, modifier: Mod
     }
 }
 
+@Composable
+private fun GroupAlarmCard(
+    alarm: AlarmData,
+    ownerName: String,
+    ownerEmoji: String,
+    participantEmojis: String,
+    participantCount: Int,
+    joined: Boolean,
+    onToggleJoin: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
+
+        // Créateur + heure
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier.size(36.dp).background(Color.White.copy(alpha = 0.08f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = ownerEmoji, fontSize = 18.sp)
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Text(
+                text = ownerName,
+                color = Color.White,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                text = "%02d:%02d".format(alarm.hour, alarm.minute),
+                color = GreenAccent,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Objectif
+        Text(text = alarm.objective, color = Color.White, style = MaterialTheme.typography.bodyMedium)
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Inscrits
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = participantEmojis, fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.registered_count, participantCount),
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Button(
+            onClick = onToggleJoin,
+            modifier = Modifier.fillMaxWidth().height(44.dp),
+            shape = LittleRoundedCornerShape,
+            colors = ButtonDefaults.buttonColors(containerColor = if (joined) RedFail else GreenAccent)
+        ) {
+            Text(
+                text = stringResource(if (joined) R.string.leave_alarm else R.string.join_alarm),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
 // Bouton carré du header (retour, paramètres)
 @Composable
 private fun HeaderButton(icon: ImageVector, description: String, onClick: () -> Unit) {
@@ -161,56 +301,6 @@ private fun HeaderButton(icon: ImageVector, description: String, onClick: () -> 
         contentAlignment = Alignment.Center
     ) {
         Icon(imageVector = icon, contentDescription = description, tint = Color.White, modifier = Modifier.size(20.dp))
-    }
-}
-
-// Alarme d'un membre du groupe (todo: bdd)
-@Composable
-private fun GroupAlarmCard() {
-    Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
-
-        // Membre emoji + nom + heure (todo: bdd avec celui qui le propose)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(36.dp).background(Color.White.copy(alpha = 0.08f), CircleShape), contentAlignment = Alignment.Center) {
-                Text(text = "🤔", fontSize = 18.sp)
-            }
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Text(
-                text = "Hugo M.",
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.weight(1f)
-            )
-
-            Text(text = "06:15", color = GreenAccent, style = MaterialTheme.typography.titleMedium)
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Objectif (todo: bdd)
-        Text(
-            text = "\uD83E\uDDD7 Escalader 500 marches avant 07h",
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        // Boutons
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(
-                onClick = { /* todo: rejoindre l'alarme */ },
-                modifier = Modifier.weight(1f).height(44.dp),
-                shape = LittleRoundedCornerShape,
-                colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
-            ) {
-                Text(text = stringResource(R.string.join_alarm), style = MaterialTheme.typography.labelSmall)
-            }
-        }
     }
 }
 

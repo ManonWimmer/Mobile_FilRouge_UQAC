@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
@@ -42,7 +43,7 @@ class AlarmRingActivity : ComponentActivity() {
                                 Intent(this@AlarmRingActivity, AlarmService::class.java)
                                     .setAction(AlarmService.ACTION_STOP)
                             )
-                            alarmId?.let { AlarmRepository.setEnabled(it, false) }
+                            alarmId?.let { AlarmRepository.onAlarmStopped(it, FirebaseAuth.getInstance().currentUser?.uid) }
                             finish()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),

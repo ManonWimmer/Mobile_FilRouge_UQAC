@@ -80,4 +80,11 @@
 
     // Others
     <string name="back">Back</string>
+
+    // Alarms
+    <string name="group_alarms">Group\'s alarms</string>
+    <string name="create_alarm">Create</string>
+    <string name="no_group_alarm">No alarm for this group</string>
+    <string name="registered_count">%1$d registered</string>
+    <string name="leave_alarm">Leave alarm</string>
 </resources>

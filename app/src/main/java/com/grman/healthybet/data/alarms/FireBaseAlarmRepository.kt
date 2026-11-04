@@ -3,6 +3,7 @@ package com.grman.healthybet.data.alarms
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -15,7 +16,7 @@ object AlarmRepository {
     fun create(alarm: AlarmData, onDone: (AlarmData?) -> Unit) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return onDone(null)
         val doc = collection.document()
-        val withId = alarm.copy(id = doc.id, ownerId = uid)
+        val withId = alarm.copy(id = doc.id, ownerId = uid, participantIds = listOf(uid))
         doc.set(withId)
             .addOnFailureListener { Log.e(TAG, "Échec de la sauvegarde", it) }
         onDone(withId)
@@ -39,7 +40,7 @@ object AlarmRepository {
 
     fun observeUserAlarms(userId: String, onResult: (List<AlarmData>) -> Unit): ListenerRegistration {
         return collection
-            .whereEqualTo("ownerId", userId)
+            .whereArrayContains("participantIds", userId)
             .addSnapshotListener { snap, error ->
                 if (error != null) {
                     Log.e(TAG, "Échec observeUserAlarms", error)
@@ -49,10 +50,22 @@ object AlarmRepository {
             }
     }
 
+    fun observeGroupAlarms(groupId: String, onResult: (List<AlarmData>) -> Unit): ListenerRegistration {
+        return collection
+            .whereEqualTo("groupId", groupId)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.e(TAG, "Échec observeGroupAlarms", error)
+                    return@addSnapshotListener
+                }
+                onResult(snap?.toObjects(AlarmData::class.java).orEmpty())
+            }
+    }
+
     /* Lecture unique des alarmes active d'un utilisateur (pour les programmer) */
     fun getEnabledAlarms(userId: String, onResult: (List<AlarmData>) -> Unit) {
         collection
-            .whereEqualTo("ownerId", userId)
+            .whereArrayContains("participantIds", userId)
             .whereEqualTo("enabled", true)
             .get()
             .addOnSuccessListener { onResult(it.toObjects(AlarmData::class.java)) }
@@ -60,5 +73,26 @@ object AlarmRepository {
                 Log.e(TAG, "Échec getEnabledAlarms", it)
                 onResult(emptyList())
             }
+    }
+
+    fun join(alarmId: String, uid: String) {
+        collection.document(alarmId).update("participantIds", FieldValue.arrayUnion(uid))
+            .addOnFailureListener { Log.e(TAG, "Échec join", it) }
+    }
+
+    fun leave(alarmId: String, uid: String) {
+        collection.document(alarmId).update("participantIds", FieldValue.arrayRemove(uid))
+            .addOnFailureListener { Log.e(TAG, "Échec leave", it) }
+    }
+
+    // Quand quelqu'un arrête la sonnerie
+    fun onAlarmStopped(alarmId: String, uid: String?) {
+        collection.document(alarmId).get().addOnSuccessListener { doc ->
+            if (uid == null || doc.getString("ownerId") == uid) {
+                setEnabled(alarmId, false)   // le créateur désactive pour tout le monde
+            } else {
+                leave(alarmId, uid)          // un participant ne se retire que lui-même
+            }
+        }
     }
 }

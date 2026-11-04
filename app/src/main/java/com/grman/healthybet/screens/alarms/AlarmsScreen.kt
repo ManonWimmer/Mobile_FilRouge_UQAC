@@ -2,6 +2,7 @@ package com.grman.healthybet.screens.alarms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,7 +45,8 @@ import kotlin.comparisons.compareBy
 
 
 @Composable
-fun AlarmsScreen(modifier: Modifier = Modifier) {
+fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit = {}) {
+
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     var alarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
 
@@ -58,12 +60,13 @@ fun AlarmsScreen(modifier: Modifier = Modifier) {
 
     AlarmsContent(
         alarms = alarms.sortedWith(compareBy({ it.hour }, { it.minute })),
+        onAlarmClick = onAlarmClick,
         modifier = modifier
     )
 }
 
 @Composable
-private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier) {
+private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit = {}) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -92,6 +95,7 @@ private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier
                 alarms.forEach { alarm ->
                     AlarmCard(
                         alarmData = alarm,
+                        onClick = { onAlarmClick(alarm.groupId) },
                         modifier = if (alarm.enabled) {
                             Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
                         } else Modifier
@@ -103,8 +107,14 @@ private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier
 }
 
 @Composable
-private fun AlarmCard(alarmData: AlarmData, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).padding(14.dp)) {
+private fun AlarmCard(alarmData: AlarmData,
+                      onClick: () -> Unit,
+                      modifier: Modifier = Modifier) {
+
+    Column(modifier = modifier.fillMaxWidth()
+        .background(FieldBg, MediumRoundedCornerShape)
+        .clickable(enabled = alarmData.groupId.isNotBlank()) { onClick() }
+        .padding(14.dp)) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 

@@ -52,11 +52,16 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmState
+import com.grman.healthybet.viewmodels.GroupsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,9 +71,16 @@ import java.util.Locale
 @Composable
 fun CreateAlarmScreen(
     modifier: Modifier = Modifier,
+    groupsViewModel: GroupsViewModel,
+    initialGroupId: String = "",
     onClose: () -> Unit = {}) {
 
     val context = LocalContext.current
+
+    // Charge mes groupes
+    LaunchedEffect(Unit) { groupsViewModel.loadGroups() }
+
+    var selectedGroupId by remember { mutableStateOf(initialGroupId) }
 
     val notifPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -80,16 +92,23 @@ fun CreateAlarmScreen(
     var target by remember { mutableStateOf("") }
 
     fun programmer() {
+        if (selectedGroupId.isBlank())
+            return
+
         //Permission notifications (Android 13+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         val alarm = AlarmData(
+            groupId = selectedGroupId,
+
             hour = timeState.hour,
             minute = timeState.minute,
+
             objective = target.toString(),
             advancement = AlarmState.EN_COURS.name,
+
             success = false,
             enabled = true
         )
@@ -110,6 +129,7 @@ fun CreateAlarmScreen(
             } else {
                 val heure = SimpleDateFormat("EEE HH:mm", Locale.FRANCE).format(Date(trigger)) //J'ai aucune idée de ce que c'est ici
                 Toast.makeText(context, "Réveil programmé : $heure", Toast.LENGTH_SHORT).show()
+                onClose()
             }
         }
     }
@@ -188,12 +208,40 @@ fun CreateAlarmScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Sélection du groupe
+        Text(text = "Groupe", color = GraySubtitle, style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (groupsViewModel.myGroups.isEmpty()) {
+            Text(
+                text = "Rejoins ou crée un groupe pour pouvoir programmer un réveil.",
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                groupsViewModel.myGroups.forEach { group ->
+                    GroupChip(
+                        label = "${group.emoji} ${group.name}",
+                        selected = selectedGroupId == group.id,
+                        onClick = { selectedGroupId = group.id }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
         // Bouton programmer réveil
         Button(
             onClick = { programmer() },
+            enabled = selectedGroupId.isNotBlank() && target.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = LittleRoundedCornerShape,
-            colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
+            colors = ButtonDefaults.buttonColors(containerColor = GreenAccent, disabledContainerColor = GreenAccent.copy(alpha = 0.3f))
         ) {
             Text(
                 text = "Programmer mon réveil \u23F0",
@@ -203,6 +251,20 @@ fun CreateAlarmScreen(
     }
 }
 
+
+@Composable
+private fun GroupChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    Text(
+        text = label,
+        color = if (selected) GreenAccent else Color.White,
+        style = MaterialTheme.typography.labelMedium,
+        modifier = Modifier
+            .background(if (selected) GreenAccent.copy(alpha = 0.15f) else FieldBg, LittleRoundedCornerShape)
+            .border(1.dp, if (selected) GreenAccent else Color.White.copy(alpha = 0.1f), LittleRoundedCornerShape)
+            .clickable { onClick() }
+            .padding(horizontal = 14.dp, vertical = 10.dp)
+    )
+}
 
 // Text field classique mais qui a une bordure de couleur quand selectionné
 @Composable
@@ -233,6 +295,6 @@ private fun AlarmTextField(value: String, onValueChange: (String) -> Unit, place
 @Composable
 fun CreateAlarmScreenPreview() {
     HealthyBetTheme {
-        CreateAlarmScreen()
+        CreateAlarmScreen(groupsViewModel = GroupsViewModel())
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.grman.healthybet.screens.alarms.AlarmsScreen
 import com.grman.healthybet.screens.connexion.ConnexionScreen
 import com.grman.healthybet.screens.alarms.CreateAlarmScreen
@@ -53,14 +54,18 @@ fun AppNavigation(modifier: Modifier = Modifier,
 
         composable(Routes.SIGNUP) {
             SignUpScreen(
-                onAccountCreationClick = { navController.navigate(Routes.HOME)},
+                onAccountCreationClick = {
+                    navController.navigate(Routes.HOME) { popUpTo(Routes.WELCOME) { inclusive = true } }
+                },
                 onBackClick = { navController.popBackStack() }
             )
         }
 
         composable(Routes.LOGIN) {
             ConnexionScreen(
-                onConnexionClick = { navController.navigate(Routes.HOME)},
+                onConnexionClick = {
+                    navController.navigate(Routes.HOME) { popUpTo(Routes.WELCOME) { inclusive = true } }
+                },
                 onBackClick = { navController.popBackStack() }
             )
         }
@@ -72,12 +77,21 @@ fun AppNavigation(modifier: Modifier = Modifier,
             )
         }
 
-        composable(Routes.CREATE_ALARM){
-            CreateAlarmScreen()
+        composable(Routes.ALARM) {
+            AlarmsScreen(
+                onAlarmClick = { groupId -> navController.navigate("${Routes.GROUP_DETAIL}/$groupId") }
+            )
         }
 
-        composable (Routes.ALARM) {
-            AlarmsScreen()
+        composable(
+            "${Routes.CREATE_ALARM}?groupId={groupId}",
+            arguments = listOf(navArgument("groupId") { defaultValue = "" })
+        ) { entry ->
+            CreateAlarmScreen(
+                groupsViewModel = groupsViewModel,
+                initialGroupId = entry.arguments?.getString("groupId").orEmpty(),
+                onClose = { navController.popBackStack() }
+            )
         }
 
         composable(Routes.GROUPS) {
@@ -99,7 +113,8 @@ fun AppNavigation(modifier: Modifier = Modifier,
             GroupDetailScreen(
                 groupId = entry.arguments?.getString("groupId") ?: "",
                 viewModel = groupsViewModel,
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                onCreateAlarmClick = { id -> navController.navigate("${Routes.CREATE_ALARM}?groupId=$id") }
             )
         }
 

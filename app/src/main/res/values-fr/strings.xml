@@ -80,4 +80,11 @@
 
     // Others
     <string name="back">Retour</string>
+
+    // Alarms
+    <string name="group_alarms">Réveils du groupe</string>
+    <string name="create_alarm">Créer</string>
+    <string name="no_group_alarm">Aucun réveil pour ce groupe</string>
+    <string name="registered_count">%1$d inscrit.s</string>
+    <string name="leave_alarm">Se désinscrire</string>
 </resources>
