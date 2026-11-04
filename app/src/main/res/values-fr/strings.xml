@@ -96,6 +96,7 @@
     <string name="alarm_in_progress">En cours</string>
     <string name="alarm_success">Réussi ✅</string>
     <string name="alarm_fail">Raté ❌</string>
+    <string name="steps_progress">%1$,d / %2$,d pas</string>
 
     // Create alarm screen
     <string name="login_first">Connecte-toi d\'abord</string>

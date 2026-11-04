@@ -70,8 +70,6 @@ fun HomeScreen(modifier: Modifier = Modifier,
                onCreateAlarmClick : () -> Unit = {},
                onSelectAlarmScreen : () -> Unit = {}) {
 
-    val appContext = LocalContext.current.applicationContext
-
     val user = FirebaseAuth.getInstance().currentUser
 
     val defaultUsername = stringResource(R.string.username_not_found)
@@ -85,21 +83,13 @@ fun HomeScreen(modifier: Modifier = Modifier,
         PermissionController.createRequestPermissionResultContract()
     ) { /* refus : les pas ne seront pas comptés */ }
 
-    // Get emoji + setup stead reader
+    // Get emoji
     LaunchedEffect(Unit) {
         val uid = user?.uid ?: return@LaunchedEffect
         FirebaseFirestore.getInstance().collection("members").document(uid).get()
             .addOnSuccessListener { doc ->
                 emoji = doc.getString("emoji") ?: defaultEmoji
             }
-
-        if (StepsReader.isAvailable(appContext)) {
-            val granted = HealthConnectClient.getOrCreate(appContext).permissionController.getGrantedPermissions()
-
-            if (!granted.containsAll(StepsReader.permissions)) {
-                healthPermissionLauncher.launch(StepsReader.permissions)
-            }
-        }
     }
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)){

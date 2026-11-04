@@ -1,5 +1,6 @@
 package com.grman.healthybet.screens.alarms
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,10 +36,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
 import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
+import com.grman.healthybet.data.alarms.AlarmResult
 import com.grman.healthybet.data.alarms.AlarmState
 import com.grman.healthybet.data.alarms.objectiveText
 import com.grman.healthybet.data.health.HealthDebug
@@ -74,15 +79,31 @@ fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit =
         onDispose { listener?.remove() }
     }
 
-    // Debug + progression en continu tant que l'écran est visible
+    // Health permission
+    val healthPermissionLauncher = rememberLauncherForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { }
+
+    LaunchedEffect(Unit) {
+        if (StepsReader.isAvailable(appContext)) {
+            val granted = HealthConnectClient.getOrCreate(appContext)
+                .permissionController.getGrantedPermissions()
+            if (!granted.containsAll(StepsReader.permissions)) {
+                healthPermissionLauncher.launch(StepsReader.permissions)
+            }
+        }
+    }
+
+    // Mise à jour des pas toutes les POLL_MS tant que l'écran est visible
     // todo: voir en background pour envoyer notif
     LaunchedEffect(uid) {
         if (uid == null) return@LaunchedEffect
         while (true) {
             if (HealthDebug.ENABLED) debugText = StepsReader.debugSnapshot(appContext)
 
+            // currentAlarms est toujours la dernière liste reçue de Firestore
             currentAlarms
-                .filter { it.results[uid]?.finished == false }
+                .filter { it.results[uid]?.finished == false } // seulement les alarmes en cours
                 .forEach { refreshProgress(appContext, it, uid) }
 
             delay(HealthDebug.POLL_MS)
@@ -91,13 +112,19 @@ fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit =
 
     AlarmsContent(
         alarms = alarms.sortedWith(compareBy({ it.hour }, { it.minute })),
+        uid = uid,
         onAlarmClick = onAlarmClick,
         modifier = modifier
     )
 }
 
 @Composable
-private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit = {}) {
+private fun AlarmsContent(
+    alarms: List<AlarmData>,
+    uid: String?,
+    modifier: Modifier = Modifier,
+    onAlarmClick: (String) -> Unit = {}) {
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -131,6 +158,7 @@ private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier
                 alarms.forEach { alarm ->
                     AlarmCard(
                         alarmData = alarm,
+                        result = uid?.let { alarm.results[it] },
                         onClick = { onAlarmClick(alarm.groupId) },
                         modifier = if (alarm.enabled) {
                             Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
@@ -144,8 +172,21 @@ private fun AlarmsContent(alarms: List<AlarmData>, modifier: Modifier = Modifier
 
 @Composable
 private fun AlarmCard(alarmData: AlarmData,
+                      result: AlarmResult?,
                       onClick: () -> Unit,
                       modifier: Modifier = Modifier) {
+
+    // Statut calculé à partir du résultat
+    val inProgress = result != null && !result.finished
+    val failed = result != null && result.finished && !result.success
+
+    val statusColor = if (failed) RedFail else GreenAccent
+    val statusText = when {
+        result == null -> stringResource(R.string.alarm_none)
+        inProgress -> stringResource(R.string.alarm_in_progress)
+        result.success -> stringResource(R.string.alarm_success)
+        else -> stringResource(R.string.alarm_fail)
+    }
 
     Column(modifier = modifier.fillMaxWidth()
         .background(FieldBg, MediumRoundedCornerShape)
@@ -167,12 +208,8 @@ private fun AlarmCard(alarmData: AlarmData,
             // Alarm status badge
             Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
                 Text(
-                    text = when (alarmData.state) {
-                        AlarmState.NONE -> stringResource(R.string.alarm_none)
-                        AlarmState.IN_PROGRESS -> stringResource(R.string.alarm_in_progress)
-                        AlarmState.DONE -> if (alarmData.success) stringResource(R.string.alarm_success) else stringResource(R.string.alarm_fail)
-                    },
-                    color = if (alarmData.success) GreenAccent else RedFail,
+                    text = statusText,
+                    color = statusColor,
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = TextAlign.Center
                 )
@@ -187,6 +224,26 @@ private fun AlarmCard(alarmData: AlarmData,
             color = GraySubtitle,
             style = MaterialTheme.typography.bodyMedium
         )
+
+        // Pas depuis la sonnerie / objectif (en cours ou terminé)
+        if (result != null && alarmData.stepGoal > 0) {
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = stringResource(R.string.steps_progress, result.steps, alarmData.stepGoal),
+                color = Color.White,
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            LinearProgressIndicator(
+                progress = { (result.steps / alarmData.stepGoal.toFloat()).coerceIn(0f, 1f) },
+                modifier = Modifier.fillMaxWidth(),
+                color = statusColor,
+                trackColor = Color.White.copy(alpha = 0.1f)
+            )
+        }
 
         Spacer(modifier = Modifier.height(14.dp))
 
@@ -206,19 +263,17 @@ private fun AlarmCard(alarmData: AlarmData,
 fun AlarmsScreenPreview() {
     HealthyBetTheme {
         AlarmsContent(
+            uid = "preview",
             alarms = listOf(
                 AlarmData(
                     id = "1", hour = 6, minute = 30,
                     stepGoal = 5000, durationMinutes = 45,
-                    advancement = AlarmState.IN_PROGRESS.name,
-                    enabled = true
+                    results = mapOf("me" to AlarmResult(startedAt = 0L, steps = 2300))
                 ),
                 AlarmData(
                     id = "2", hour = 7, minute = 0,
                     stepGoal = 8000, durationMinutes = 90,
-                    advancement = AlarmState.DONE.name,
-                    success = true,
-                    enabled = false
+                    results = mapOf("me" to AlarmResult(startedAt = 0L, steps = 8000, success = true, finished = true))
                 )
             )
         )

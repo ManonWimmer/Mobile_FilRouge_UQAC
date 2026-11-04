@@ -96,6 +96,7 @@
     <string name="alarm_in_progress">In progress</string>
     <string name="alarm_success">Success ✅</string>
     <string name="alarm_fail">Fail ❌</string>
+    <string name="steps_progress">%1$,d / %2$,d steps</string>
 
     // Create alarm screen
     <string name="login_first">Log in first</string>
@@ -124,5 +125,6 @@
     // Alarm service
     <string name="alarm_notif_title">⏰ Réveil HealthyBet</string>
     <string name="alarm_channel_name">Réveil</string>
+
 
 </resources>
