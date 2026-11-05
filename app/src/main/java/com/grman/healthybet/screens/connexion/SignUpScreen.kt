@@ -1,5 +1,6 @@
     package com.grman.healthybet.screens.connexion
 
+    import androidx.compose.animation.AnimatedVisibility
     import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
     import androidx.compose.foundation.border
@@ -203,8 +204,8 @@
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Message d'erreur sign up
-                viewModel.errorMessage?.let {
-                    Text(text = it, color = Color(0xFFFF6B6B), fontSize = 13.sp)
+                AnimatedVisibility(visible = viewModel.errorMessage != null) {
+                    Text(text = viewModel.errorMessage.orEmpty(), color = Color(0xFFFF6B6B), fontSize = 13.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
