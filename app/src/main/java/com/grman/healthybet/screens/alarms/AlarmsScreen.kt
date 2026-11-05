@@ -48,6 +48,7 @@ import com.grman.healthybet.data.alarms.objectiveText
 import com.grman.healthybet.data.health.HealthDebug
 import com.grman.healthybet.data.health.StepsReader
 import com.grman.healthybet.data.health.refreshProgress
+import com.grman.healthybet.items.AlarmCard
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -157,7 +158,7 @@ private fun AlarmsContent(
             ) {
                 alarms.forEach { alarm ->
                     AlarmCard(
-                        alarmData = alarm,
+                        alarm = alarm,
                         result = uid?.let { alarm.results[it] },
                         onClick = { onAlarmClick(alarm.groupId) },
                         modifier = if (alarm.enabled) {
@@ -166,94 +167,6 @@ private fun AlarmsContent(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun AlarmCard(alarmData: AlarmData,
-                      result: AlarmResult?,
-                      onClick: () -> Unit,
-                      modifier: Modifier = Modifier) {
-
-    // Statut calculé à partir du résultat
-    val inProgress = result != null && !result.finished
-    val failed = result != null && result.finished && !result.success
-
-    val statusColor = if (failed) RedFail else GreenAccent
-    val statusText = when {
-        result == null -> stringResource(R.string.alarm_none)
-        inProgress -> stringResource(R.string.alarm_in_progress)
-        result.success -> stringResource(R.string.alarm_success)
-        else -> stringResource(R.string.alarm_fail)
-    }
-
-    Column(modifier = modifier.fillMaxWidth()
-        .background(FieldBg, MediumRoundedCornerShape)
-        .clickable(enabled = alarmData.groupId.isNotBlank()) { onClick() }
-        .padding(14.dp)) {
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            // Alarm time
-            Text(
-                text = stringResource(R.string.alarm_time, alarmData.hour, alarmData.minute),
-                color = Color.White,
-                style = MaterialTheme.typography.displayMedium
-            )
-
-            // Status à droite
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Alarm status badge
-            Box(modifier = Modifier.background(if (alarmData.success) GreenAccent.copy(alpha = 0.15f) else RedFail.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
-                Text(
-                    text = statusText,
-                    color = statusColor,
-                    style = MaterialTheme.typography.labelSmall,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        // Text Objectif réveil
-        Text(
-            text = objectiveText(LocalContext.current, alarmData.stepGoal, alarmData.durationMinutes),
-            color = GraySubtitle,
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        // Pas depuis la sonnerie / objectif (en cours ou terminé)
-        if (result != null && alarmData.stepGoal > 0) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = stringResource(R.string.steps_progress, result.steps, alarmData.stepGoal),
-                color = Color.White,
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            LinearProgressIndicator(
-                progress = { (result.steps / alarmData.stepGoal.toFloat()).coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth(),
-                color = statusColor,
-                trackColor = Color.White.copy(alpha = 0.1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        // Membres
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "\uD83D\uDE0F\uD83D\uDE0F\uD83D\uDE0F", fontSize = 14.sp) // todo : (emojis personnes)
         }
     }
 }

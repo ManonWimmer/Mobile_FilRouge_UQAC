@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.grman.healthybet.data.health.HealthDebug
+import kotlin.text.get
 
 object AlarmRepository {
     private const val TAG = "AlarmRepository"
@@ -102,18 +103,39 @@ object AlarmRepository {
             .addOnFailureListener { HealthDebug.error("startTracking failed", it) }
     }
 
+    private val db get() = FirebaseFirestore.getInstance()
+
     // Met à jour les pas, statut et si fini
-    fun saveProgress(alarmId: String, uid: String, steps: Int, success: Boolean, finished: Boolean) {
+    fun saveProgress(alarmId: String, groupId: String, uid: String, steps: Int, stepGoal: Int, success: Boolean, finished: Boolean) {
         HealthDebug.debug("saveProgress alarm=$alarmId steps=$steps success=$success finished=$finished")
 
-        collection.document(alarmId).update(
-            mapOf(
+        val alarmRef = collection.document(alarmId)
+        val groupRef = db.collection("groups").document(groupId)
+
+        // Update points, steps, finished et sucess (run transaction au cas ou save progress est appelé 2 fois la meme frame)
+        db.runTransaction { transaction ->
+
+            // Déjà terminé on save rien
+            if (transaction.get(alarmRef).getBoolean("results.$uid.finished") == true)
+                return@runTransaction null
+
+            val points = if (finished && success) stepGoal else 0 // 1 pas d'objectif = 1 point, seulement si réussi
+
+            transaction.update(alarmRef, mapOf(
                 "results.$uid.steps" to steps,
                 "results.$uid.success" to success,
-                "results.$uid.finished" to finished
-            )
-        )
+                "results.$uid.finished" to finished,
+                "results.$uid.points" to points
+            ))
+
+            // increment des points du user id dans le groupe avec ceux qu'il viennent de gagner avec cette alarme
+            if (points > 0 && groupId.isNotBlank()) {
+                transaction.update(groupRef, "points.$uid", FieldValue.increment(points.toLong()))
+            }
+            null
+        }
             .addOnSuccessListener { HealthDebug.debug("saveProgress OK") }
             .addOnFailureListener { HealthDebug.error("saveProgress failed", it) }
     }
+
 }

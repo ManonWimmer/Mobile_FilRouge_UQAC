@@ -36,7 +36,8 @@ data class AlarmResult(
     val startedAt: Long = 0L,      // ms : moment où la sonnerie a démarré
     val steps: Int = 0,
     val success: Boolean = false,
-    val finished: Boolean = false  // objectif atteint ou délai écoulé
+    val finished: Boolean = false,  // objectif atteint ou délai écoulé
+    val points: Int = 0   // points gagnés (0 si raté)
 )
 
 enum class AlarmState{
@@ -66,6 +67,6 @@ fun formatDuration(context: Context, minutes: Int): String {
 }
 
 public fun roundStepGoal(stepGoal: Int): Int {
-    return (stepGoal / 500f).roundToInt() * 500;
+    return (stepGoal / 10f).roundToInt() * 10; // Arrondi à 10 (des fois 499 sur le slider)
 }
 

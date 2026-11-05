@@ -307,6 +307,29 @@ fun CreateAlarmScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Bouton de test
+        Button(
+            onClick = {
+                stepGoal = 10f
+                durationMinutes = 5f
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = LittleRoundedCornerShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = FieldBg,
+                contentColor = GreenAccent
+            )
+        ) {
+            Text(
+                text = stringResource(R.string.test_alarm),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         // Bouton programmer réveil
         Button(
             onClick = { programmer() },

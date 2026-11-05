@@ -63,7 +63,8 @@ import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
 import com.grman.healthybet.viewmodels.GroupsViewModel
 import androidx.compose.ui.platform.LocalInspectionMode
-
+import com.grman.healthybet.items.AlarmCard
+import com.grman.healthybet.items.AlarmOwner
 
 
 @Composable
@@ -90,6 +91,11 @@ fun GroupDetailScreen(
         if (isPreview) return@DisposableEffect onDispose {}
         val listener = AlarmRepository.observeGroupAlarms(groupId) { groupAlarms = it }
         onDispose { listener.remove() }
+    }
+
+    // Update de classement à chaque réouverture + quand alarme change
+    LaunchedEffect(groupId, groupAlarms) {
+        viewModel.loadGroupMembers(groupId)
     }
 
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)) {
@@ -174,21 +180,25 @@ fun GroupDetailScreen(
                 val owner = viewModel.groupMembers.find { it.id == alarm.ownerId }
                 val participants = viewModel.groupMembers.filter { it.id in alarm.participantIds }
 
-                GroupAlarmCard(
+                AlarmCard(
                     alarm = alarm,
-                    ownerName = owner?.username.orEmpty(),
-                    ownerEmoji = owner?.emoji ?: "🤔",
+                    result = uid?.let { alarm.results[it] },
+                    owner = AlarmOwner(owner?.emoji ?: "🤔", owner?.username.orEmpty()),
                     participantEmojis = participants.joinToString("") { it.emoji },
                     participantCount = alarm.participantIds.size,
-                    joined = joined,
-                    isOwner = uid != null && alarm.ownerId == uid,
-                    onDelete = { alarmToDelete = alarm },
-                    onToggleJoin = {
-                        if (uid != null) {
-                            if (joined) AlarmRepository.leave(alarm.id, uid)
-                            else AlarmRepository.join(alarm.id, uid)
-                            AlarmSync.sync(context, uid)
-                        }
+                    actions = {
+                        GroupAlarmActions(
+                            joined = joined,
+                            isOwner = uid != null && alarm.ownerId == uid,
+                            onToggleJoin = {
+                                if (uid != null) {
+                                    if (joined) AlarmRepository.leave(alarm.id, uid)
+                                    else AlarmRepository.join(alarm.id, uid)
+                                    AlarmSync.sync(context, uid)
+                                }
+                            },
+                            onDelete = { alarmToDelete = alarm }
+                        )
                     }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -254,92 +264,39 @@ fun GroupDetailScreen(
 }
 
 @Composable
-private fun GroupAlarmCard(
-    alarm: AlarmData,
-    ownerName: String,
-    ownerEmoji: String,
-    participantEmojis: String,
-    participantCount: Int,
-    isOwner: Boolean,
-    onDelete: () -> Unit,
+private fun GroupAlarmActions(
     joined: Boolean,
-    onToggleJoin: () -> Unit
+    isOwner: Boolean,
+    onToggleJoin: () -> Unit,
+    onDelete: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).padding(16.dp)) {
+    // Rejoindre / quitter
+    Button(
+        onClick = onToggleJoin,
+        modifier = Modifier.fillMaxWidth().height(44.dp),
+        shape = LittleRoundedCornerShape,
+        colors = ButtonDefaults.buttonColors(containerColor = if (joined) RedFail else GreenAccent)
+    ) {
+        Text(
+            text = stringResource(if (joined) R.string.leave_alarm else R.string.join_alarm),
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
 
-        // Créateur + heure
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier.size(36.dp).background(Color.White.copy(alpha = 0.08f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = ownerEmoji, fontSize = 18.sp)
-            }
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Text(
-                text = ownerName,
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.weight(1f)
-            )
-
-            Text(
-                text = stringResource(R.string.time_hours_minutes, alarm.hour, alarm.minute),
-                color = GreenAccent,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Objectif
-        Text(text = objectiveText(LocalContext.current, alarm.stepGoal, alarm.durationMinutes), color = Color.White, style = MaterialTheme.typography.bodyMedium)
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Inscrits
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = participantEmojis, fontSize = 16.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.registered_count, participantCount),
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        // Joindre / Quitter
-        Button(
-            onClick = onToggleJoin,
+    // Suppression : réservée au créateur
+    if (isOwner) {
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = onDelete,
             modifier = Modifier.fillMaxWidth().height(44.dp),
             shape = LittleRoundedCornerShape,
-            colors = ButtonDefaults.buttonColors(containerColor = if (joined) RedFail else GreenAccent)
+            border = BorderStroke(1.dp, RedFail),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = RedFail)
         ) {
             Text(
-                text = stringResource(if (joined) R.string.leave_alarm else R.string.join_alarm),
+                text = stringResource(R.string.delete_alarm),
                 style = MaterialTheme.typography.labelSmall
             )
-        }
-
-        // Suppression : réservée au créateur
-        if (isOwner) {
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = onDelete,
-                modifier = Modifier.fillMaxWidth().height(44.dp),
-                shape = LittleRoundedCornerShape,
-                border = BorderStroke(1.dp, RedFail),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = RedFail)
-            ) {
-                Text(
-                    text = stringResource(R.string.delete_alarm),
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
         }
     }
 }
