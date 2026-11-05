@@ -1,5 +1,9 @@
 package com.grman.healthybet
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,7 +47,19 @@ fun AppNavigation(modifier: Modifier = Modifier,
     NavHost(
         navController = navController,
         startDestination = Routes.WELCOME,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(350)) + fadeIn(tween(350))
+        },
+        exitTransition = {
+            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left, tween(350), targetOffset = { it / 4 }) + fadeOut(tween(350))
+        },
+        popEnterTransition = {
+            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(350), initialOffset = { it / 4 }) + fadeIn(tween(350))
+        },
+        popExitTransition = {
+            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(350)) + fadeOut(tween(350))
+        }
     ) {
         composable(Routes.WELCOME) {
             WelcomeScreen(
