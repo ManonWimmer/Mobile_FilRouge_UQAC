@@ -13,10 +13,15 @@
     import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
     import androidx.compose.foundation.layout.height
+    import androidx.compose.foundation.layout.imePadding
+    import androidx.compose.foundation.layout.navigationBarsPadding
     import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.layout.size
+    import androidx.compose.foundation.layout.statusBarsPadding
     import androidx.compose.foundation.layout.widthIn
+    import androidx.compose.foundation.rememberScrollState
     import androidx.compose.foundation.text.KeyboardOptions
+    import androidx.compose.foundation.verticalScroll
     import androidx.compose.material3.Button
     import androidx.compose.material3.ButtonDefaults
     import androidx.compose.material3.CircularProgressIndicator
@@ -61,16 +66,18 @@
         Box(
             modifier = modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 24.dp)
         ) {
-
-            // Bouton retour
-            BackButton(
-                onClick = onBackClick,
-                modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)
-            )
-
-            Column(modifier = Modifier.widthIn(min = 400.dp, max = 600.dp).align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(top = 72.dp, bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
                 // Logo
                 Box(
@@ -205,8 +212,10 @@
 
                 // Message d'erreur sign up
                 AnimatedVisibility(visible = viewModel.errorMessage != null) {
-                    Text(text = viewModel.errorMessage.orEmpty(), color = Color(0xFFFF6B6B), fontSize = 13.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Column {
+                        Text(text = viewModel.errorMessage.orEmpty(), color = Color(0xFFFF6B6B), fontSize = 13.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
 
                 // S'inscrire
@@ -224,7 +233,15 @@
                     }
                 }
             }
+
+            // Bouton retour
+            BackButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.TopStart).padding(top = 16.dp)
+            )
         }
+
+
     }
 
     @Preview(showBackground = true, backgroundColor = 0xFF0D1117)
