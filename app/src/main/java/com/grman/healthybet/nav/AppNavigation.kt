@@ -101,7 +101,14 @@ fun AppNavigation(modifier: Modifier = Modifier,
 
         composable(
             "${Routes.CREATE_ALARM}?groupId={groupId}",
-            arguments = listOf(navArgument("groupId") { defaultValue = "" })
+            arguments = listOf(navArgument("groupId") { defaultValue = "" }),
+            enterTransition = {
+                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up, tween(400))
+            },
+            exitTransition = { fadeOut(tween(200)) },
+            popExitTransition = {
+                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down, tween(400))
+            }
         ) { entry ->
             CreateAlarmScreen(
                 groupsViewModel = groupsViewModel,
