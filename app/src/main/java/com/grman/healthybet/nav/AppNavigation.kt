@@ -86,7 +86,9 @@ fun AppNavigation(modifier: Modifier = Modifier,
             )
         }
 
-        composable(Routes.HOME) {
+        composable(Routes.HOME,
+            enterTransition = { fadeIn(tween(250)) },
+            exitTransition = { fadeOut(tween(250)) }) {
             HomeScreen(
                 onCreateAlarmClick = { navController.navigate(Routes.CREATE_ALARM)},
                 onSelectAlarmScreen = { navController.navigate(Routes.ALARM)}
