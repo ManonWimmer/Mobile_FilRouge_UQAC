@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -61,6 +62,7 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
     Box(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(horizontal = 24.dp)
     ) {
 
@@ -162,8 +164,10 @@ fun ConnexionScreen(modifier: Modifier = Modifier,
 
             // Msg d'erreur
             AnimatedVisibility(visible = viewModel.errorMessage != null) {
-                Text(text = viewModel.errorMessage.orEmpty(), color = Color(0xFFFF6B6B), fontSize = 13.sp)
-                Spacer(modifier = Modifier.height(8.dp))
+                Column {
+                    Text(text = viewModel.errorMessage.orEmpty(), color = Color(0xFFFF6B6B), fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
 
             // Se connecter
