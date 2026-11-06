@@ -31,8 +31,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,7 +58,12 @@ import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grman.healthybet.R
+import com.grman.healthybet.alarm.AlarmScheduler.nextTriggerMillis
+import com.grman.healthybet.data.alarms.AlarmData
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.health.StepsReader
+import com.grman.healthybet.items.AlarmCard
+import kotlinx.coroutines.delay
 
 data class FriendBet(
     val emoji: String,
@@ -77,6 +84,29 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
     val defaultEmoji = stringResource(R.string.default_emoji)
     var emoji by remember { mutableStateOf(defaultEmoji) }
+
+    val uid = user?.uid
+
+    // Alarms de l'user
+    var alarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
+    DisposableEffect(uid) {
+        val listener = uid?.let { id -> AlarmRepository.observeUserAlarms(id) { alarms = it } }
+        onDispose { listener?.remove() }
+    }
+
+    // temps actuel rafraîchi toutes les 30 s pour avoir la prochaine alarme
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            now = System.currentTimeMillis()
+            delay(30_000)
+        }
+    }
+
+    // pochain réveil : actif + la sonnerie pas déclenchée
+    val nextAlarm = alarms
+        .filter { it.enabled && uid != null && uid !in it.results.keys }
+        .minByOrNull { it.nextTriggerMillis(now) }
 
     // Health connect permission
     val healthPermissionLauncher = rememberLauncherForActivityResult(
@@ -117,69 +147,38 @@ fun HomeScreen(modifier: Modifier = Modifier,
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Réveil de demain
-        // todo: utiliser code de alarms screen
-        Box(modifier = Modifier.fillMaxWidth().background(FieldBg, HighRoundedCornerShape).clickable(onClick = onSelectAlarmScreen).border(1.dp, GreenAccent, HighRoundedCornerShape).padding(20.dp)) {
-            Column {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    // Icon réveil
-                    Icon(
-                        imageVector = Icons.Filled.WatchLater,
-                        contentDescription = stringResource(R.string.alarm_icon_description),
-                        tint = GreenAccent,
-                        modifier = Modifier.size(16.dp)
-                    )
+        // Prochain réveil
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Filled.WatchLater,
+                contentDescription = stringResource(R.string.alarm_icon_description),
+                tint = GreenAccent,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = stringResource(R.string.alarm_next),
+                color = GreenAccent,
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
-                    Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-                    // Text réveil de demain
-                    Text(
-                        text = stringResource(R.string.alarm_tomorrow),
-                        color = GreenAccent,
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    // Text Temps restant todo avec bdd
-                    Box(modifier = Modifier.background(GreenAccent.copy(alpha = 0.15f), LittleRoundedCornerShape).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                        Text(
-                            text = "- 08h 12m",
-                            color = GreenAccent,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                    //TODO BUTTON SWAP DE SCREEN
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Heure du reveil todo avec bdd
-                Text(
-                    text = "06:30",
-                    color = Color.White,
-                    style = MaterialTheme.typography.displayMedium
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // Text Objectif réveil (todo: bdd)
-                Text(
-                    text = "\uD83C\uDFC3 Courir 5km avant 07:15", // (emoji courir)
-                    color = GraySubtitle,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Membre (todo: bdd)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "\uD83D\uDE0F\uD83D\uDE0F\uD83D\uDE0F", fontSize = 14.sp) // (emojis personnes)
-                }
-            }
+        if (nextAlarm != null) {
+            AlarmCard(
+                alarm = nextAlarm,
+                result = null, // pas encore sonné
+                onClick = onSelectAlarmScreen,
+                modifier = Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.no_next_alarm),
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))

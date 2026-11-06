@@ -138,4 +138,30 @@ object AlarmRepository {
             .addOnFailureListener { HealthDebug.error("saveProgress failed", it) }
     }
 
+    // Alarmes de tous les groupes de l'user (max 30)
+    fun observeAlarmsOfGroups(groupIds: List<String>, onResult: (List<AlarmData>) -> Unit): ListenerRegistration =
+        collection.whereIn("groupId", groupIds.take(30))
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    Log.e(TAG, "Failed to observe groups alarms", error)
+                    return@addSnapshotListener
+                }
+                onResult(snap?.toObjects(AlarmData::class.java).orEmpty())
+            }
+
+    fun observeUserStats(
+        userId: String,
+        onResult: (points: Int, successfulAlarms: Int) -> Unit
+    ): ListenerRegistration {
+        return observeUserAlarms(userId) { alarms ->
+            val results = alarms.mapNotNull { it.results[userId] }
+
+            val points = results.sumOf { it.points }
+            val successfulAlarms = results.count {
+                it.finished && it.success
+            }
+
+            onResult(points, successfulAlarms)
+        }
+    }
 }

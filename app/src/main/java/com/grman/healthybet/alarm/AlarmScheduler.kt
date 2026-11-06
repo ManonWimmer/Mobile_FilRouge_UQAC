@@ -76,4 +76,15 @@ object AlarmScheduler {
     fun cancelAll(context: Context) {
         trackedIds(context).toList().forEach { cancel(context, it) }
     }
+
+    // Prochain déclenchement de l'alarme, en ms (si l'heure est passé ajd, c demain)
+    fun AlarmData.nextTriggerMillis(now: Long = System.currentTimeMillis()): Long =
+        java.util.Calendar.getInstance().apply {
+            timeInMillis = now
+            set(java.util.Calendar.HOUR_OF_DAY, hour)
+            set(java.util.Calendar.MINUTE, minute)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+            if (timeInMillis <= now) add(java.util.Calendar.DAY_OF_YEAR, 1)
+        }.timeInMillis
 }

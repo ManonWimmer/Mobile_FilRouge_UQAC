@@ -20,8 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.grman.healthybet.R
+import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -56,19 +59,39 @@ fun ProfileScreen(
     val defaultEmoji = stringResource(R.string.default_emoji)
     var emoji by remember { mutableStateOf(defaultEmoji) }
 
+    var points by remember { mutableIntStateOf(0) }
+    var alarmsDone by remember { mutableIntStateOf(0) }
 
-    // Récupère emoji
+    // Récupère profil et emoji
     LaunchedEffect(user?.uid) {
         val uid = user?.uid ?: return@LaunchedEffect
-        FirebaseFirestore.getInstance().collection("members").document(uid).get()
+
+        //Todo: fonction propre à part ?
+        FirebaseFirestore.getInstance()
+            .collection("members")
+            .document(uid)
+            .get()
             .addOnSuccessListener { doc ->
                 emoji = doc.getString("emoji") ?: defaultEmoji
+                username = doc.getString("username") ?: defaultUsername
             }
     }
 
-    // todo: vraies stats depuis la bdd
-    val points = 1200
-    val alarmsDone = 12
+    // Statistiques en temps réel depuis les alarmes Firestore
+    DisposableEffect(user?.uid) {
+        val uid = user?.uid
+
+        val listener = uid?.let {
+            AlarmRepository.observeUserStats(it) { totalPoints, successfulAlarms ->
+                points = totalPoints
+                alarmsDone = successfulAlarms
+            }
+        }
+
+        onDispose {
+            listener?.remove()
+        }
+    }
 
     Column(
         modifier = modifier
@@ -117,9 +140,21 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Stats
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(value = "$points", label = stringResource(R.string.profile_points), modifier = Modifier.weight(1f))
-            StatCard(value = "$alarmsDone", label = stringResource(R.string.profile_succesful_alarms), modifier = Modifier.weight(1f))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StatCard(
+                value = points.toString(),
+                label = stringResource(R.string.profile_points),
+                modifier = Modifier.weight(1f)
+            )
+
+            StatCard(
+                value = alarmsDone.toString(),
+                label = stringResource(R.string.profile_succesful_alarms),
+                modifier = Modifier.weight(1f)
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))

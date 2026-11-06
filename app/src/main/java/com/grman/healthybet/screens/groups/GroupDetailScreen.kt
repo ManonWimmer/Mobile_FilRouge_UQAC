@@ -63,8 +63,12 @@ import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
 import com.grman.healthybet.viewmodels.GroupsViewModel
 import androidx.compose.ui.platform.LocalInspectionMode
+import com.grman.healthybet.data.alarms.hasRung
 import com.grman.healthybet.items.AlarmCard
+import com.grman.healthybet.items.AlarmGroup
 import com.grman.healthybet.items.AlarmOwner
+import com.grman.healthybet.items.DeleteAlarmDialog
+import com.grman.healthybet.items.AlarmActions
 
 
 @Composable
@@ -184,12 +188,15 @@ fun GroupDetailScreen(
                     alarm = alarm,
                     result = uid?.let { alarm.results[it] },
                     owner = AlarmOwner(owner?.emoji ?: "🤔", owner?.username.orEmpty()),
+                    group = group?.let { AlarmGroup(it.emoji, it.name) },
                     participantEmojis = participants.joinToString("") { it.emoji },
                     participantCount = alarm.participantIds.size,
                     actions = {
-                        GroupAlarmActions(
+                        AlarmActions(
                             joined = joined,
                             isOwner = uid != null && alarm.ownerId == uid,
+                            canLeave = uid?.let { alarm.results[it] } == null,
+                            canDelete = !alarm.hasRung,
                             onToggleJoin = {
                                 if (uid != null) {
                                     if (joined) AlarmRepository.leave(alarm.id, uid)
@@ -241,63 +248,7 @@ fun GroupDetailScreen(
     }
 
     alarmToDelete?.let { alarm ->
-        AlertDialog(
-            onDismissRequest = { alarmToDelete = null },
-            title = { Text(stringResource(R.string.delete_alarm_question)) },
-            text = { Text(stringResource(R.string.delete_alarm_description)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    AlarmRepository.delete(alarm.id)
-                    AlarmScheduler.cancel(context, alarm.id) // annule la sonnerie sur ce téléphone
-                    alarmToDelete = null
-                }) {
-                    Text(stringResource(R.string.delete), color = RedFail)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { alarmToDelete = null }) {
-                    Text(stringResource(R.string.cancel)) // todo: faire cancel pour tous les autres inscrits
-                }
-            }
-        )
-    }
-}
-
-@Composable
-private fun GroupAlarmActions(
-    joined: Boolean,
-    isOwner: Boolean,
-    onToggleJoin: () -> Unit,
-    onDelete: () -> Unit
-) {
-    // Rejoindre / quitter
-    Button(
-        onClick = onToggleJoin,
-        modifier = Modifier.fillMaxWidth().height(44.dp),
-        shape = LittleRoundedCornerShape,
-        colors = ButtonDefaults.buttonColors(containerColor = if (joined) RedFail else GreenAccent)
-    ) {
-        Text(
-            text = stringResource(if (joined) R.string.leave_alarm else R.string.join_alarm),
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
-
-    // Suppression : réservée au créateur
-    if (isOwner) {
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedButton(
-            onClick = onDelete,
-            modifier = Modifier.fillMaxWidth().height(44.dp),
-            shape = LittleRoundedCornerShape,
-            border = BorderStroke(1.dp, RedFail),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = RedFail)
-        ) {
-            Text(
-                text = stringResource(R.string.delete_alarm),
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
+        DeleteAlarmDialog(alarm = alarm, onDismiss = { alarmToDelete = null })
     }
 }
 

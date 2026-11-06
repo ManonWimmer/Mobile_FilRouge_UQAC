@@ -64,6 +64,16 @@ fun GroupsScreen(
     // Launched effect -> à chaque fois que le composable apparait à l'écran
     LaunchedEffect(Unit) { viewModel.loadGroups() } // Update affichage groups
 
+    LaunchedEffect(
+        viewModel.myGroups.map { it.id },
+        viewModel.discoverGroups.map { it.id }
+    ) {
+        val groupIds = viewModel.myGroups.map { it.id } +
+                viewModel.discoverGroups.map { it.id }
+
+        viewModel.loadMembersForGroups(groupIds)
+    }
+
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Column(modifier = modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 16.dp)) {
@@ -104,6 +114,7 @@ fun GroupsScreen(
             // My groups
             0 -> MyGroupsContent(
                 groups = viewModel.myGroups,
+                viewModel = viewModel,
                 onGroupClick = onGroupClick,
                 onCreateGroupClick = onCreateGroupClick,
                 modifier = Modifier.weight(1f)
@@ -154,7 +165,12 @@ private fun GroupTabs(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 }
 
 @Composable
-private fun MyGroupsContent(groups: List<Group>, onGroupClick: (String) -> Unit, onCreateGroupClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun MyGroupsContent(groups: List<Group>,
+                            viewModel: GroupsViewModel,
+                            onGroupClick: (String) -> Unit,
+                            onCreateGroupClick: () -> Unit,
+                            modifier: Modifier = Modifier) {
+
     LazyColumn(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
         // Pas de groupe
@@ -171,7 +187,12 @@ private fun MyGroupsContent(groups: List<Group>, onGroupClick: (String) -> Unit,
         }
 
         items(groups, key = { it.id }) { group ->
-            GroupCard(group = group, onClick = { onGroupClick(group.id) })
+            GroupCard(
+                group = group,
+                memberEmojis = viewModel.membersByGroup[group.id]
+                    ?.map { it.emoji }
+                    ?: group.memberEmojis,
+                onClick = { onGroupClick(group.id) })
         }
 
         // Créer nouveau groupe
@@ -239,6 +260,9 @@ fun SearchGroupContent(viewModel: GroupsViewModel, onGroupClick: (String) -> Uni
                 val isMember = viewModel.myGroups.any { it.id == group.id }
                 GroupCard(
                     group = group,
+                    memberEmojis = viewModel.membersByGroup[group.id]
+                        ?.map { it.emoji }
+                        ?: group.memberEmojis,
                     onClick = { onGroupClick(group.id) },
                     onJoinClick = if (isMember) null else { { viewModel.joinGroup(group.id) } }
                 )
@@ -248,7 +272,12 @@ fun SearchGroupContent(viewModel: GroupsViewModel, onGroupClick: (String) -> Uni
 }
 
 @Composable
-internal fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = Modifier, onJoinClick: (() -> Unit)? = null ) {
+internal fun GroupCard(group: Group,
+                       onClick: () -> Unit,
+                       modifier: Modifier = Modifier,
+                       onJoinClick: (() -> Unit)? = null,
+                       memberEmojis: List<String> = group.memberEmojis) {
+
     Column(modifier = modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).border(1.dp, Color.White.copy(alpha = 0.08f), MediumRoundedCornerShape).clickable { onClick() }.padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -270,8 +299,15 @@ internal fun GroupCard(group: Group, onClick: () -> Unit, modifier: Modifier = M
                 )
             }
 
-            // Aperçu des membres avec emojis temp (todo: photos de profil)
-            Text(text = group.memberEmojis.take(3).joinToString(""), fontSize = 20.sp)
+            // Aperçu des membres
+            Text(
+                text = memberEmojis
+                    .filter { it.isNotBlank() }
+                    .distinct()
+                    .take(3)
+                    .joinToString(""),
+                fontSize = 20.sp
+            )
         }
 
         // Bouton rejoindre (uniquement pour les groupes à découvrir)

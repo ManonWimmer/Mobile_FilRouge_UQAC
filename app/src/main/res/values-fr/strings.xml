@@ -16,6 +16,9 @@
     <string name="alarm_icon_description">Icône de réveil</string>
     <string name="alarm_tomorrow">ALARME DE DEMAIN</string>
     <string name="alarm_new">+  Nouveau Réveil</string>
+    <string name="alarm_next">Prochain réveil</string>
+    <string name="time_remaining">- %1$02dh %2$02dm</string>
+    <string name="no_next_alarm">Aucun réveil programmé</string>
 
     // Profile screen
     <string name="profile_title">Profil</string>
@@ -102,6 +105,12 @@
     <string name="alarm_fail">Raté ❌</string>
     <string name="steps_progress">%1$,d / %2$,d pas</string>
     <string name="points_earned">+%1$d points</string>
+    <string name="available_alarms">Alarmes à rejoindre</string>
+    <string name="no_available_alarms">Aucune alarme disponible dans tes groupes</string>
+    <string name="alarm_rings_in">Sonne dans %1$s</string>
+    <string name="alarm_time_left">Temps restant : %1$s</string>
+    <string name="alarm_ends_at">Fin à %1$s</string>
+    <string name="alarm_locked">Réveil déjà sonné : désinscription impossible</string>
 
     // Create alarm screen
     <string name="login_first">Connecte-toi d\'abord</string>

@@ -40,15 +40,22 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
+import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
 import com.grman.healthybet.data.alarms.AlarmResult
 import com.grman.healthybet.data.alarms.AlarmState
+import com.grman.healthybet.data.alarms.hasRung
 import com.grman.healthybet.data.alarms.objectiveText
+import com.grman.healthybet.data.groups.Group
+import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.data.health.HealthDebug
 import com.grman.healthybet.data.health.StepsReader
 import com.grman.healthybet.data.health.refreshProgress
+import com.grman.healthybet.items.AlarmActions
 import com.grman.healthybet.items.AlarmCard
+import com.grman.healthybet.items.AlarmGroup
+import com.grman.healthybet.items.DeleteAlarmDialog
 import com.grman.healthybet.ui.theme.FieldBg
 import com.grman.healthybet.ui.theme.GraySubtitle
 import com.grman.healthybet.ui.theme.GreenAccent
@@ -56,18 +63,32 @@ import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
+import com.grman.healthybet.viewmodels.GroupsViewModel
 import kotlinx.coroutines.delay
 import kotlin.comparisons.compareBy
 
 
 @Composable
-fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit = {}) {
+fun AlarmsScreen(modifier: Modifier = Modifier,
+                 groupsViewModel: GroupsViewModel,
+                 onAlarmClick: (String) -> Unit = {}) {
 
     val uid = FirebaseAuth.getInstance().currentUser?.uid
     val appContext = LocalContext.current.applicationContext
     var alarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
     var debugText by remember { mutableStateOf("") }
     val currentAlarms by rememberUpdatedState(alarms)
+    var alarmToDelete by remember { mutableStateOf<AlarmData?>(null) }
+
+    var groupAlarms by remember { mutableStateOf<List<AlarmData>>(emptyList()) }
+    val myGroupIds = groupsViewModel.myGroups.map { it.id }
+
+    // Noms des groupes
+    LaunchedEffect(Unit) { groupsViewModel.loadGroups() }
+
+    // Membres des groupes des alarmes (pour les emojis des inscrits)
+    val groupIds = (alarms + groupAlarms).map { it.groupId }.filter { it.isNotBlank() }.distinct()
+    LaunchedEffect(groupIds) { groupsViewModel.loadMembersForGroups(groupIds) }
 
     // Démarre l'écoute quand l'écran apparaît, la coupe quand il disparaît
     DisposableEffect(uid) {
@@ -79,6 +100,20 @@ fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit =
         }
         onDispose { listener?.remove() }
     }
+
+    DisposableEffect(myGroupIds) {
+        if (myGroupIds.isEmpty()) {
+            groupAlarms = emptyList()
+            return@DisposableEffect onDispose {}
+        }
+        val listener = AlarmRepository.observeAlarmsOfGroups(myGroupIds) { groupAlarms = it }
+        onDispose { listener.remove() }
+    }
+
+    // alarmes des groupes de l'user ou il est pas inscrit
+    val availableAlarms = groupAlarms
+        .filter { uid != null && uid !in it.participantIds && it.enabled }
+        .sortedWith(compareBy({ it.hour }, { it.minute }))
 
     // Health permission
     val healthPermissionLauncher = rememberLauncherForActivityResult(
@@ -114,9 +149,29 @@ fun AlarmsScreen(modifier: Modifier = Modifier, onAlarmClick: (String) -> Unit =
     AlarmsContent(
         alarms = alarms.sortedWith(compareBy({ it.hour }, { it.minute })),
         uid = uid,
+        availableAlarms = availableAlarms,
+        groups = groupsViewModel.myGroups,
+        membersByGroup = groupsViewModel.membersByGroup,
         onAlarmClick = onAlarmClick,
+        onLeave = { alarm ->
+            if (uid != null) {
+                AlarmRepository.leave(alarm.id, uid)
+                AlarmSync.sync(appContext, uid)
+            }
+        },
+        onJoin = { alarm ->
+            if (uid != null) {
+                AlarmRepository.join(alarm.id, uid)
+                AlarmSync.sync(appContext, uid)
+            }
+        },
+        onDelete = { alarm -> alarmToDelete = alarm },
         modifier = modifier
     )
+
+    alarmToDelete?.let { alarm ->
+        DeleteAlarmDialog(alarm = alarm, onDismiss = { alarmToDelete = null })
+    }
 }
 
 @Composable
@@ -124,7 +179,14 @@ private fun AlarmsContent(
     alarms: List<AlarmData>,
     uid: String?,
     modifier: Modifier = Modifier,
-    onAlarmClick: (String) -> Unit = {}) {
+    availableAlarms: List<AlarmData> = emptyList(),
+    groups: List<Group> = emptyList(),
+    membersByGroup: Map<String, List<GroupMember>> = emptyMap(),
+    onAlarmClick: (String) -> Unit = {},
+    onLeave: (AlarmData) -> Unit = {},
+    onJoin: (AlarmData) -> Unit = {},
+    onDelete: (AlarmData) -> Unit = {}
+) {
 
     Column(
         modifier = modifier
@@ -133,42 +195,130 @@ private fun AlarmsContent(
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
 
-        // Text tes réveils
-        Text(
-            text = stringResource(R.string.your_alarms),
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
+        // Section 1 : alarmes de groupes avec user inscrit
+        SectionTitle(stringResource(R.string.your_alarms))
 
         if (alarms.isEmpty()) {
-
-            // Pas de réveils
-            Text(
-                text = stringResource(R.string.no_alarms),
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            EmptyText(stringResource(R.string.no_alarms))
         } else {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 alarms.forEach { alarm ->
-                    AlarmCard(
+                    JoinedAlarmItem(
                         alarm = alarm,
-                        result = uid?.let { alarm.results[it] },
-                        onClick = { onAlarmClick(alarm.groupId) },
-                        modifier = if (alarm.enabled) {
-                            Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
-                        } else Modifier
+                        uid = uid,
+                        group = groups.find { it.id == alarm.groupId },
+                        members = membersByGroup[alarm.groupId].orEmpty(),
+                        onClick = onAlarmClick,
+                        onLeave = onLeave,
+                        onDelete = onDelete
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Section 2 : alarmes de mes groupes où je peux m'inscrire
+        SectionTitle(stringResource(R.string.available_alarms))
+
+        if (availableAlarms.isEmpty()) {
+            EmptyText(stringResource(R.string.no_available_alarms))
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                availableAlarms.forEach { alarm ->
+                    AvailableAlarmItem(
+                        alarm = alarm,
+                        uid = uid,
+                        group = groups.find { it.id == alarm.groupId },
+                        members = membersByGroup[alarm.groupId].orEmpty(),
+                        onClick = onAlarmClick,
+                        onJoin = onJoin,
+                        onDelete = onDelete
                     )
                 }
             }
         }
     }
+}
+
+// Alarme où je suis inscrit : bordure verte si active, bouton « Se désinscrire »
+@Composable
+private fun JoinedAlarmItem(
+    alarm: AlarmData,
+    uid: String?,
+    group: Group?,
+    members: List<GroupMember>,
+    onClick: (String) -> Unit,
+    onLeave: (AlarmData) -> Unit,
+    onDelete: (AlarmData) -> Unit
+) {
+    val participants = members.filter { it.id in alarm.participantIds }
+
+    AlarmCard(
+        alarm = alarm,
+        result = uid?.let { alarm.results[it] },
+        group = group?.let { AlarmGroup(it.emoji, it.name) },
+        participantEmojis = participants.joinToString("") { it.emoji },
+        participantCount = alarm.participantIds.size,
+        onClick = if (alarm.groupId.isNotBlank()) { { onClick(alarm.groupId) } } else null,
+        actions = {
+            AlarmActions(
+                joined = true,
+                isOwner = uid != null && alarm.ownerId == uid,
+                canLeave = uid?.let { alarm.results[it] } == null,
+                canDelete = !alarm.hasRung,
+                onToggleJoin = { onLeave(alarm) },
+                onDelete = { onDelete(alarm) }
+            )
+        },
+        modifier = if (alarm.enabled) {
+            Modifier.border(1.dp, GreenAccent, MediumRoundedCornerShape)
+        } else Modifier
+    )
+}
+
+// Alarme de mon groupe où je ne suis pas inscrit : pas de résultat, bouton « Rejoindre »
+@Composable
+private fun AvailableAlarmItem(
+    alarm: AlarmData,
+    uid: String?,
+    group: Group?,
+    members: List<GroupMember>,
+    onClick: (String) -> Unit,
+    onJoin: (AlarmData) -> Unit,
+    onDelete: (AlarmData) -> Unit
+) {
+    val participants = members.filter { it.id in alarm.participantIds }
+
+    AlarmCard(
+        alarm = alarm,
+        result = null, // je ne participe pas : pas de progression à afficher
+        group = group?.let { AlarmGroup(it.emoji, it.name) },
+        participantEmojis = participants.joinToString("") { it.emoji },
+        participantCount = alarm.participantIds.size,
+        onClick = if (alarm.groupId.isNotBlank()) { { onClick(alarm.groupId) } } else null,
+        actions = {
+            AlarmActions(
+                joined = false,
+                isOwner = uid != null && alarm.ownerId == uid,
+                canLeave = true,
+                canDelete = !alarm.hasRung,
+                onToggleJoin = { onJoin(alarm) },
+                onDelete = { onDelete(alarm) }
+            )
+        }
+    )
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(text = text, color = Color.White, style = MaterialTheme.typography.titleMedium)
+    Spacer(modifier = Modifier.height(20.dp))
+}
+
+@Composable
+private fun EmptyText(text: String) {
+    Text(text = text, color = GraySubtitle, style = MaterialTheme.typography.bodyMedium)
 }
 
 @Preview(showBackground = true)

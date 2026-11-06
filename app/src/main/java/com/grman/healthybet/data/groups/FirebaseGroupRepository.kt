@@ -66,4 +66,6 @@ class FirebaseGroupRepository(
         // Classé du plus de points au moins
         return result.sortedByDescending { it.points }
     }
+
+
 }

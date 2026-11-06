@@ -16,6 +16,9 @@
     <string name="alarm_icon_description">Alarm icon</string>
     <string name="alarm_tomorrow">TOMORROW\'S ALARM</string>
     <string name="alarm_new">+  New Alarm</string>
+    <string name="alarm_next">Next alarm</string>
+    <string name="time_remaining">- %1$02dh %2$02dm</string>
+    <string name="no_next_alarm">No alarm scheduled</string>
 
     // Profile screen
     <string name="profile_title">Profile</string>
@@ -102,6 +105,12 @@
     <string name="alarm_fail">Fail ❌</string>
     <string name="steps_progress">%1$,d / %2$,d steps</string>
     <string name="points_earned">+%1$d points</string>
+    <string name="available_alarms">Alarms you can join</string>
+    <string name="no_available_alarms">No alarms available in your groups</string>
+    <string name="alarm_rings_in">Rings in %1$s</string>
+    <string name="alarm_time_left">Time left: %1$s</string>
+    <string name="alarm_ends_at">Ends at %1$s</string>
+    <string name="alarm_locked">Réveil déjà sonné : désinscription impossible</string>
 
     // Create alarm screen
     <string name="login_first">Log in first</string>

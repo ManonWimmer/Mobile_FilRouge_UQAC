@@ -70,3 +70,5 @@ public fun roundStepGoal(stepGoal: Int): Int {
     return (stepGoal / 10f).roundToInt() * 10; // Arrondi à 10 (des fois 499 sur le slider)
 }
 
+// Vrai si la sonnerie s'est déjà déclenchée pour au moins un inscrit
+val AlarmData.hasRung: Boolean get() = results.isNotEmpty()

@@ -36,16 +36,30 @@ import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
 import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.grman.healthybet.alarm.AlarmScheduler.nextTriggerMillis
+import com.grman.healthybet.data.alarms.formatDuration
+import kotlinx.coroutines.delay
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 // Créateur de l'alarme (affiché seulement si fourni)
+//todo: mettre fichier séparé pout que ce soit + propre
 data class AlarmOwner(val emoji: String, val name: String)
-
+data class AlarmGroup(val emoji: String, val name: String)
 @Composable
 fun AlarmCard(
     alarm: AlarmData,
     result: AlarmResult?, // (null = sonnerie pas encore déclenchée)
     modifier: Modifier = Modifier,
     owner: AlarmOwner? = null,
+    group: AlarmGroup? = null,
     participantEmojis: String = "",
     participantCount: Int? = null,
     onClick: (() -> Unit)? = null,
@@ -61,6 +75,33 @@ fun AlarmCard(
         else -> stringResource(R.string.alarm_fail)
     }
 
+    val context = LocalContext.current
+    val inProgress = result != null && !result.finished
+    val waiting = result == null
+
+    // Horloge locale : tourne seulement tant que le compte à rebours est utile
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(waiting, inProgress) {
+        while (waiting || inProgress) {
+            now = System.currentTimeMillis()
+            delay(15_000)
+        }
+    }
+
+// Début de la fenêtre : prochaine sonnerie, ou sonnerie déjà déclenchée
+    val durationMs = alarm.durationMinutes * 60_000L
+    val windowStart = if (result != null) result.startedAt else alarm.nextTriggerMillis(now)
+    val endMillis = windowStart + durationMs
+
+// Minutes restantes (arrondi au-dessus)
+    val minutesLeft = when {
+        waiting -> (alarm.nextTriggerMillis(now) - now + 59_999L) / 60_000L
+        inProgress -> (endMillis - now + 59_999L) / 60_000L
+        else -> 0L
+    }.coerceAtLeast(0L).toInt()
+
+    val endText = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).format(Date(endMillis))
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -68,6 +109,15 @@ fun AlarmCard(
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
             .padding(14.dp)
     ) {
+        // Groupe (optionnel)
+        if (group != null) {
+            Text(
+                text = stringResource(R.string.group_label, group.emoji, group.name),
+                color = GreenAccent,
+                style = MaterialTheme.typography.labelMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         // Créateur (optionnel)
         if (owner != null) {
@@ -141,6 +191,29 @@ fun AlarmCard(
                 text = stringResource(R.string.points_earned, result.points),
                 color = statusColor,
                 style = MaterialTheme.typography.labelMedium
+            )
+        }
+
+        if (alarm.durationMinutes > 0) {
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Temps restant (avant la sonnerie ou avant la fin du délai)
+            if (waiting || inProgress) {
+                Text(
+                    text = stringResource(
+                        if (waiting) R.string.alarm_rings_in else R.string.alarm_time_left,
+                        formatDuration(context, minutesLeft)
+                    ),
+                    color = GreenAccent,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+
+            // Heure de fin de la fenêtre pour faire les pas
+            Text(
+                text = stringResource(R.string.alarm_ends_at, endText),
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodySmall
             )
         }
 

@@ -97,6 +97,7 @@ fun AppNavigation(modifier: Modifier = Modifier,
 
         composable(Routes.ALARM) {
             AlarmsScreen(
+                groupsViewModel = groupsViewModel,
                 onAlarmClick = { groupId -> navController.navigate("${Routes.GROUP_DETAIL}/$groupId") }
             )
         }

@@ -2,6 +2,7 @@ package com.grman.healthybet.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,7 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
     var searchQuery by mutableStateOf("")
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
+    val membersByGroup = mutableStateMapOf<String, List<GroupMember>>()
 
     // Recherche: filtre simplement sur le nom (un texte vide garde tous les groupes)
     val filteredDiscover: List<Group>
@@ -112,6 +114,21 @@ class GroupsViewModel(private val groupRepository: GroupRepository = FirebaseGro
                 groupMembers.addAll(members)
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Erreur de chargement des membres"
+            }
+        }
+    }
+
+    // groupId -> membres
+    fun loadMembersForGroups(groupIds: Collection<String>) {
+        viewModelScope.launch {
+            groupIds.distinct().forEach { id ->
+                if (!membersByGroup.containsKey(id)) {
+                    try {
+                        membersByGroup[id] = groupRepository.getGroupMembers(id)
+                    } catch (e: Exception) {
+                        errorMessage = e.message ?: "Erreur de chargement des membres"
+                    }
+                }
             }
         }
     }
