@@ -63,7 +63,9 @@ fun ConnexionScreen(
             isPassword = true
         )
 
+        /*
         Spacer(modifier = Modifier.height(10.dp))
+
 
         // Mot de passe oublié
         Text( // todo: on click
@@ -73,6 +75,8 @@ fun ConnexionScreen(
             modifier = Modifier.fillMaxWidth().padding(end = 4.dp),
             textAlign = TextAlign.End
         )
+        */
+
 
         Spacer(modifier = Modifier.height(20.dp))
 
