@@ -59,7 +59,9 @@ class MainActivity : ComponentActivity() {
                                 selected = when (currentRoute) {
                                     Routes.HOME -> BottomNavItem.Home
                                     Routes.ALARM -> BottomNavItem.Alarms
+                                    Routes.CREATE_ALARM -> BottomNavItem.Alarms
                                     Routes.GROUPS -> BottomNavItem.Groups
+                                    Routes.CREATE_GROUP -> BottomNavItem.Groups
                                     Routes.PROFILE -> BottomNavItem.Profile
                                     else -> BottomNavItem.Home
                                 },
@@ -74,7 +76,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(route) {
                                         popUpTo(Routes.HOME) { saveState = true }
                                         launchSingleTop = true
-                                        restoreState = true
+                                        restoreState = false
                                     }
                                 }
                             )
