@@ -1,3 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <resources>
+    // Welcome screen
     <string name="app_name">HealthyBet</string>
+    <string name="app_title">An alarm clock that really motivates.</string>
+    <string name="app_pitch">Take care of your body and be better than your friends!</string>
+
+    <string name="sign_up">Sign up</string>
+    <string name="log_in">Log in</string>
+
+    // Home screen
+    <string name="username_not_found">Username not found</string>
+    <string name="default_emoji">😄</string>
+    <string name="greeting">Hi, %1$s!</string>
+    <string name="alarm_icon_description">Alarm icon</string>
+    <string name="alarm_tomorrow">TOMORROW\'S ALARM</string>
+    <string name="alarm_new">+  New Alarm</string>
+    <string name="alarm_next">Next alarm</string>
+    <string name="time_remaining">- %1$02dh %2$02dm</string>
+    <string name="no_next_alarm">No alarm scheduled</string>
+
+    // Profile screen
+    <string name="profile_title">Profile</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_succesful_alarms">Successful alarms</string>
+    <string name="log_out">Log out</string>
+
+    // Sign up screen
+    <string name="app_pitch_sign_up">Join the arena and start waking up fit</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="pseudo_example">Pseudo123</string>
+    <string name="e_mail">E-mail address</string>
+    <string name="e_mail_example">jean.dupont@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="password_example">healthy123</string>
+    <string name="password_confirm">Confirm the password</string>
+    <string name="password_confirm_example">Repeat your password</string>
+    <string name="create_account">Create my account</string>
+    <string name="logo_app_description">App icon</string>
+
+    // Connexion screen
+    <string name="connexion_greeting">Welcome back!</string>
+    <string name="app_pitch_connexion">Log in to beat your friends!</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="connect">Connect</string>
+
+    // Create groups screen
+    <string name="create_group">Créer le groupe</string>
+    <string name="close_icon_description">Close icon</string>
+    <string name="group_icon">GROUP ICON</string>
+    <string name="group_infos">INFORMATIONS</string>
+    <string name="group_name">Group name</string>
+    <string name="group_name_example">The morning runners</string>
+    <string name="group_description">Description (optional)</string>
+    <string name="group_description_example">Wake up before 6, let\'s motivate ourselves!</string>
+
+    // Group detail screen
+    <string name="default_group_name">Group</string>
+    <string name="active_members">%1$d active member.s</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="leave_group">Leave group</string>
+    <string name="leave_group_question">Leave group?</string>
+    <string name="leave_group_description">You will no longer see this group in "My groups." You can join it again from Discover.</string>
+    <string name="quit">Quit</string>
+    <string name="cancel">Cancel</string>
+    <string name="join_alarm">Join alarm</string>
+    <string name="delete">Delete</string>
+    <string name="delete_alarm">Delete alarm</string>
+    <string name="delete_alarm_question">Delete this alarm?</string>
+    <string name="delete_alarm_description">It will be deleted for all participants.</string>
+
+    // Groups screens
+    <string name="groups">Groups</string>
+    <string name="my_groups">My groups</string>
+    <string name="discover">Discover</string>
+    <string name="no_groups">You don’t have a group yet. Create your own or join one in Discover!</string>
+    <string name="create_new_group">+  Create new group</string>
+
+    // Search groups screen
+    <string name="search_group">Search for a group...</string>
+    <string name="search">Search</string>
+    <string name="all_groups">ALL GROUPS</string>
+    <string name="results">RESULTS</string>
+    <string name="no_group_found">No groups found. Why not create your own?</string>
+    <string name="join_group">Join</string>
+
+    // Others
+    <string name="back">Back</string>
+
+    // Alarms
+    <string name="group_alarms">Group\'s alarms</string>
+    <string name="create_alarm">Create alarm</string>
+    <string name="no_group_alarm">No alarm for this group</string>
+    <string name="registered_count">%1$d registered</string>
+    <string name="leave_alarm">Leave alarm</string>
+
+    // Alarms screen
+    <string name="your_alarms">Your alarms</string>
+    <string name="no_alarms">Zero alarms for the moment</string>
+    <string name="alarm_time">%1$02d : %2$02d</string>
+    <string name="alarm_none">Programmed</string>
+    <string name="alarm_in_progress">In progress</string>
+    <string name="alarm_success">Success ✅</string>
+    <string name="alarm_fail">Fail ❌</string>
+    <string name="steps_progress">%1$,d / %2$,d steps</string>
+    <string name="points_earned">+%1$d points</string>
+    <string name="available_alarms">Alarms you can join</string>
+    <string name="no_available_alarms">No alarms available in your groups</string>
+    <string name="alarm_rings_in">Rings in %1$s</string>
+    <string name="alarm_time_left">Time left: %1$s</string>
+    <string name="alarm_ends_at">Ends at %1$s</string>
+    <string name="alarm_locked">Réveil déjà sonné : désinscription impossible</string>
+
+    // Create alarm screen
+    <string name="login_first">Log in first</string>
+    <string name="allow_exact_alarms">Allows exact alarms and then retries</string>
+    <string name="alarm_scheduled">Alarm scheduled: %1$s</string>
+    <string name="close">Close</string>
+    <string name="alarm_hour">ALARM TIME</string>
+    <string name="step_goal">STEP GOAL</string>
+    <string name="step_goal_value">%,d</string>
+    <string name="alarm_duration">TIME TO ACHIEVE</string>
+    <string name="group">Group</string>
+    <string name="join_group_alarm">Join or create a group to be able to schedule an alarm</string>
+    <string name="group_label">%1$s %2$s</string>
+    <string name="set_alarm">Set the alarm ⏰</string>
+    <string name="alarm_objective">👟 %,d steps in %s</string>
+    <string name="duration_minutes">%1$dmin</string>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$dh%2$02d</string>
+    <string name="time_hours_minutes">%1$02d : %2$02d</string>
+    <string name="test_alarm">Test (10 steps / 5 min)</string>
+
+    // Alarm ring activity
+    <string name="ring_wake_up">⏰ Wake up!</string>
+    <string name="objective_description">Objective: %1$s</string>
+    <string name="ring_stop">Ring stop</string>
+
+    // Alarm service
+    <string name="alarm_notif_title">⏰ Réveil HealthyBet</string>
+    <string name="alarm_channel_name">Réveil</string>
+
+
 </resources>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    // Welcome screen
+    <string name="app_name">HealthyBet</string>
+    <string name="app_title">Un réveil qui motive vraiment.</string>
+    <string name="app_pitch">Prends soin de ton corps et sois meilleur que tes potes !</string>
+
+    <string name="sign_up">Inscription</string>
+    <string name="log_in">Connexion</string>
+
+    // Home screen
+    <string name="username_not_found">Nom d\'utilisateur introuvable</string>
+    <string name="default_emoji">😄</string>
+    <string name="greeting">Salut, %1$s !</string>
+    <string name="alarm_icon_description">Icône de réveil</string>
+    <string name="alarm_tomorrow">ALARME DE DEMAIN</string>
+    <string name="alarm_new">+  Nouveau Réveil</string>
+    <string name="alarm_next">Prochain réveil</string>
+    <string name="time_remaining">- %1$02dh %2$02dm</string>
+    <string name="no_next_alarm">Aucun réveil programmé</string>
+
+    // Profile screen
+    <string name="profile_title">Profil</string>
+    <string name="profile_points">Points</string>
+    <string name="profile_succesful_alarms">Alarmes réussies</string>
+    <string name="log_out">Se déconnecter</string>
+
+    // Sign up screen
+    <string name="app_pitch_sign_up">Rejoins l\'arène et commence à te réveiller en forme</string>
+    <string name="pseudo">Pseudo</string>
+    <string name="pseudo_example">Pseudo123</string>
+    <string name="e_mail">Adresse e-mail</string>
+    <string name="e_mail_example">jean.dupont@gmail.com</string>
+    <string name="password">Mot de passe</string>
+    <string name="password_example">healthy123</string>
+    <string name="password_confirm">Confirmer le mot de passe</string>
+    <string name="password_confirm_example">Répète ton mot de passe</string>
+    <string name="create_account">Créer mon compte</string>
+    <string name="logo_app_description">Icône de l\'app</string>
+
+    // Connexion screen
+    <string name="connexion_greeting">Ravis de te revoir !</string>
+    <string name="app_pitch_connexion">Connecte-toi pour battre tes potes !</string>
+    <string name="forgot_password">Mot de passe oublié ?</string>
+    <string name="connect">Se connecter</string>
+
+    // Create groups screen
+    <string name="create_group">Créer un groupe</string>
+    <string name="close_icon_description">Icône fermer</string>
+    <string name="group_icon">ICÔNE DU GROUPE</string>
+    <string name="group_infos">INFORMATIONS</string>
+    <string name="group_name">Nom du groupe</string>
+    <string name="group_name_example">Les coureurs du matin</string>
+    <string name="group_description">Description (optionnelle)</string>
+    <string name="group_description_example">Réveil avant 6h, on se motive !</string>
+
+    // Group detail screen
+    <string name="default_group_name">Groupe</string>
+    <string name="active_members">%1$d membre.s actif.s</string>
+    <string name="leaderboard">Classement</string>
+    <string name="leave_group">Quitter le groupe</string>
+    <string name="leave_group_question">Quitter le groupe ?</string>
+    <string name="leave_group_description">Tu ne verras plus ce groupe dans « Mes groupes ». Tu pourras le rejoindre à nouveau depuis Découvrir.</string>
+    <string name="quit">Quitter</string>
+    <string name="cancel">Annuler</string>
+    <string name="join_alarm">Rejoindre l\'alarme</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_alarm">Supprimer le réveil</string>
+    <string name="delete_alarm_question">Supprimer ce réveil ?</string>
+    <string name="delete_alarm_description">Il sera supprimé pour tous les inscrits.</string>
+
+    // Groups screens
+    <string name="groups">Groupes</string>
+    <string name="my_groups">Mes groupes</string>
+    <string name="discover">Découvrir</string>
+    <string name="no_groups">Tu n\'as pas encore de groupe. Crée le tien ou rejoins-en un dans Découvrir !</string>
+    <string name="create_new_group">+  Créer un nouveau groupe</string>
+
+    // Search groups screen
+    <string name="search_group">Rechercher un groupe...</string>
+    <string name="search">Recherche</string>
+    <string name="all_groups">TOUS LES GROUPES</string>
+    <string name="results">RÉSULTATS</string>
+    <string name="no_group_found">Aucun groupe trouvé. Pourquoi ne pas créer le tien ?</string>
+    <string name="join_group">Rejoindre</string>
+
+    // Others
+    <string name="back">Retour</string>
+
+    // Alarms
+    <string name="group_alarms">Réveils du groupe</string>
+    <string name="create_alarm">Créer un réveil</string>
+    <string name="no_group_alarm">Aucun réveil pour ce groupe</string>
+    <string name="registered_count">%1$d inscrit.s</string>
+    <string name="leave_alarm">Se désinscrire</string>
+
+    // Alarms screen
+    <string name="your_alarms">Tes réveils</string>
+    <string name="no_alarms">Pas de réveils pour l\'instant</string>
+    <string name="alarm_time">%1$02d : %2$02d</string>
+    <string name="alarm_none">Programmé</string>
+    <string name="alarm_in_progress">En cours</string>
+    <string name="alarm_success">Réussi ✅</string>
+    <string name="alarm_fail">Raté ❌</string>
+    <string name="steps_progress">%1$,d / %2$,d pas</string>
+    <string name="points_earned">+%1$d points</string>
+    <string name="available_alarms">Alarmes à rejoindre</string>
+    <string name="no_available_alarms">Aucune alarme disponible dans tes groupes</string>
+    <string name="alarm_rings_in">Sonne dans %1$s</string>
+    <string name="alarm_time_left">Temps restant : %1$s</string>
+    <string name="alarm_ends_at">Fin à %1$s</string>
+    <string name="alarm_locked">Réveil déjà sonné : désinscription impossible</string>
+
+    // Create alarm screen
+    <string name="login_first">Connecte-toi d\'abord</string>
+    <string name="allow_exact_alarms">Autorise les alarmes exactes puis réessaie</string>
+    <string name="alarm_scheduled">Réveil programmé : %1$s</string>
+    <string name="close">Fermer</string>
+    <string name="alarm_hour">HEURE DU RÉVEIL</string>
+    <string name="step_goal">OBJECTIF DE PAS</string>
+    <string name="step_goal_value">%,d</string>
+    <string name="alarm_duration">TEMPS POUR L\'ATTEINDRE</string>
+    <string name="group">Groupe</string>
+    <string name="join_group_alarm">Rejoins ou crée un groupe pour pouvoir programmer un réveil</string>
+    <string name="group_label">%1$s %2$s</string>
+    <string name="set_alarm">Programmer le réveil ⏰</string>
+    <string name="alarm_objective">👟 %,d pas en %s</string>
+    <string name="duration_minutes">%1$dmin</string>
+    <string name="duration_hours">%1$dh</string>
+    <string name="duration_hours_minutes">%1$02dh%2$02d</string>
+    <string name="time_hours_minutes">%1$02d : %2$02d</string>
+    <string name="test_alarm">Test (10 pas / 5 min)</string>
+
+    // Alarm ring activity
+    <string name="ring_wake_up">⏰ Debout !</string>
+    <string name="objective_description">Objectif : %1$s</string>
+    <string name="ring_stop">Arrêter le réveil</string>
+
+    // Alarm service
+    <string name="alarm_notif_title">⏰ HealthyBet Alarm</string>
+    <string name="alarm_channel_name">Alarm</string>
+
+</resources>
