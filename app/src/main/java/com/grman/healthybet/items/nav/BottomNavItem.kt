@@ -1,4 +1,4 @@
-package com.grman.healthybet.items
+package com.grman.healthybet.items.nav
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.Icons

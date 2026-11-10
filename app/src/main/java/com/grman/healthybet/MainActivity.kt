@@ -14,8 +14,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.alarm.AlarmSync
-import com.grman.healthybet.items.BottomNavBar
-import com.grman.healthybet.items.BottomNavItem
+import com.grman.healthybet.items.nav.BottomNavBar
+import com.grman.healthybet.items.nav.BottomNavItem
 import com.grman.healthybet.ui.theme.HealthyBetTheme
 import com.grman.healthybet.ui.theme.BgColor
 

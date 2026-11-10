@@ -1,60 +1,38 @@
 package com.grman.healthybet.screens.groups
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.grman.healthybet.R
-import com.grman.healthybet.data.auth.AuthRepository
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.data.groups.GroupRepository
 import com.grman.healthybet.data.groups.GroupsOverview
-import com.grman.healthybet.items.CloseButton
-import com.grman.healthybet.ui.theme.FieldBg
-import com.grman.healthybet.ui.theme.GrayLabel
+import com.grman.healthybet.items.common.AppButton
+import com.grman.healthybet.items.common.EmojiPicker
+import com.grman.healthybet.items.common.FieldCard
+import com.grman.healthybet.items.common.LabeledTextField
+import com.grman.healthybet.items.common.ScreenHeader
 import com.grman.healthybet.ui.theme.GraySubtitle
-import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
-import com.grman.healthybet.ui.theme.HighRoundedCornerShape
-import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
-import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
 import com.grman.healthybet.ui.theme.RedFail
 import com.grman.healthybet.viewmodels.GroupsViewModel
 
-private val groupEmojis = listOf("🏃", "🏋️", "👟", "🌅", "🔥", "💪", "🏅", "🚴", "🧘", "🥇") // emojis à choisiri
+private val groupEmojis = listOf("🏃", "🏋️", "👟", "🌅", "🔥", "💪", "🏅", "🚴", "🧘", "🥇")
 
 @Composable
 fun CreateGroupScreen(
@@ -73,19 +51,7 @@ fun CreateGroupScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-
-        // Header
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.create_group),
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Bouton fermer
-            CloseButton(onClick = onClose)
-        }
+        ScreenHeader(title = stringResource(R.string.create_group), onClose = onClose)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -95,80 +61,37 @@ fun CreateGroupScreen(
             color = GraySubtitle,
             style = MaterialTheme.typography.labelMedium
         )
-
         Spacer(modifier = Modifier.height(10.dp))
-
-        // Emojis
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            groupEmojis.forEach { item ->
-                val selected = item == emoji
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(if (selected) GreenAccent.copy(alpha = 0.15f) else FieldBg, MediumRoundedCornerShape)
-                        .border(
-                            1.dp,
-                            if (selected) GreenAccent else Color.White.copy(alpha = 0.1f),
-                            MediumRoundedCornerShape
-                        )
-                        .clickable { emoji = item },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = item, style = MaterialTheme.typography.titleMedium)
-                }
-            }
-        }
+        EmojiPicker(emojis = groupEmojis, selected = emoji, onSelect = { emoji = it })
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Infos du groupe
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(FieldBg, HighRoundedCornerShape)
-                .padding(16.dp)
-        ) {
+        FieldCard {
             Text(
                 text = stringResource(R.string.group_infos),
                 color = GraySubtitle,
                 style = MaterialTheme.typography.labelMedium
             )
-
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = stringResource(R.string.group_name),
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            GroupTextField(
+            LabeledTextField(
+                label = stringResource(R.string.group_name),
                 value = name,
                 onValueChange = { if (it.length <= 30) name = it },
-                placeholder = stringResource(R.string.group_name_example),
+                placeholder = stringResource(R.string.group_name_example)
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Text(
-                text = stringResource(R.string.group_description),
-                color = GraySubtitle,
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            GroupTextField(
+            LabeledTextField(
+                label = stringResource(R.string.group_description),
                 value = description,
                 onValueChange = { if (it.length <= 120) description = it },
                 placeholder = stringResource(R.string.group_description_example),
                 singleLine = false
             )
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
 
         // Message d'erreur
         viewModel.errorMessage?.let {
@@ -178,76 +101,26 @@ fun CreateGroupScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Bouton créer
-        Button(
-            onClick = {
-                viewModel.createGroup(name, emoji, description) { onGroupCreated() }
-            },
+        AppButton(
+            text = stringResource(R.string.create_group),
+            onClick = { viewModel.createGroup(name, emoji, description) { onGroupCreated() } },
             enabled = name.isNotBlank() && !viewModel.isLoading,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = LittleRoundedCornerShape,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = GreenAccent,
-                disabledContainerColor = GreenAccent.copy(alpha = 0.3f)
-            )
-        ) {
-            if (viewModel.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp, color = Color.Black)
-            } else {
-                Text(text = stringResource(R.string.create_group), style = MaterialTheme.typography.labelLarge)
-            }
-        }
-    }
-}
-
-// Text field partagé (création + recherche de groupe)
-@Composable
-internal fun GroupTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    singleLine: Boolean = true,
-    leadingIcon: (@Composable () -> Unit)? = null
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier.fillMaxWidth(),
-        singleLine = singleLine,
-        minLines = if (singleLine) 1 else 3,
-        shape = LittleRoundedCornerShape,
-        leadingIcon = leadingIcon,
-        placeholder = {
-            Text(text = placeholder, color = GrayLabel, style = MaterialTheme.typography.bodyMedium)
-        },
-        textStyle = MaterialTheme.typography.bodyMedium,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.White,
-            unfocusedTextColor = Color.White,
-            focusedContainerColor = Color.White.copy(alpha = 0.04f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.04f),
-            focusedBorderColor = GreenAccent,
-            unfocusedBorderColor = Color.White.copy(alpha = 0.1f),
-            cursorColor = GreenAccent
+            loading = viewModel.isLoading,
+            height = 52.dp
         )
-    )
+    }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF0D1117)
 @Composable
 fun CreateGroupScreenPreview() {
-
     val fakeRepo = object : GroupRepository {
         override suspend fun getGroups(): GroupsOverview {
             TODO("Retourner un GroupsOverview de test")
         }
         override suspend fun createGroup(name: String, emoji: String, description: String) {}
-
         override suspend fun joinGroup(groupId: String) {}
-
         override suspend fun leaveGroup(groupId: String) {}
-
         override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
     }
 

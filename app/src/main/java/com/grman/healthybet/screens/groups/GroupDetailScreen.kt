@@ -1,9 +1,5 @@
 package com.grman.healthybet.screens.groups
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,21 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -36,40 +24,33 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.grman.healthybet.R
-import com.grman.healthybet.alarm.AlarmScheduler
 import com.grman.healthybet.alarm.AlarmSync
 import com.grman.healthybet.data.alarms.AlarmData
 import com.grman.healthybet.data.alarms.AlarmRepository
-import com.grman.healthybet.data.alarms.objectiveText
+import com.grman.healthybet.data.groups.Group
 import com.grman.healthybet.data.groups.GroupMember
 import com.grman.healthybet.data.groups.GroupRepository
 import com.grman.healthybet.data.groups.GroupsOverview
-import com.grman.healthybet.items.BackButton
-import com.grman.healthybet.ui.theme.FieldBg
+import com.grman.healthybet.items.alarms.AlarmListItem
+import com.grman.healthybet.items.common.AppButton
+import com.grman.healthybet.items.common.BackButton
+import com.grman.healthybet.items.common.ConfirmDialog
+import com.grman.healthybet.items.alarms.DeleteAlarmDialog
+import com.grman.healthybet.items.common.EmptyText
+import com.grman.healthybet.items.groups.MemberRow
+import com.grman.healthybet.items.common.SectionTitle
+import com.grman.healthybet.items.common.SquareIconButton
+import com.grman.healthybet.items.alarms.sortedByTime
 import com.grman.healthybet.ui.theme.GraySubtitle
-import com.grman.healthybet.ui.theme.GreenAccent
 import com.grman.healthybet.ui.theme.HealthyBetTheme
-import com.grman.healthybet.ui.theme.HighRoundedCornerShape
-import com.grman.healthybet.ui.theme.LittleRoundedCornerShape
-import com.grman.healthybet.ui.theme.MediumRoundedCornerShape
-import com.grman.healthybet.ui.theme.RedFail
 import com.grman.healthybet.viewmodels.GroupsViewModel
-import androidx.compose.ui.platform.LocalInspectionMode
-import com.grman.healthybet.data.alarms.hasRung
-import com.grman.healthybet.items.AlarmCard
-import com.grman.healthybet.items.AlarmGroup
-import com.grman.healthybet.items.AlarmOwner
-import com.grman.healthybet.items.DeleteAlarmDialog
-import com.grman.healthybet.items.AlarmActions
-
 
 @Composable
 fun GroupDetailScreen(
@@ -77,14 +58,14 @@ fun GroupDetailScreen(
     viewModel: GroupsViewModel,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
-    onCreateAlarmClick: (String) -> Unit = {}) {
-
+    onCreateAlarmClick: (String) -> Unit = {}
+) {
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
     val uid = if (isPreview) null else FirebaseAuth.getInstance().currentUser?.uid
 
-    val group = viewModel.myGroups.find { it.id == groupId } // Get groupe avec id de la liste
-    val isMember = viewModel.myGroups.any { it.id == groupId }
+    val group = viewModel.myGroups.find { it.id == groupId }
+    val isMember = group != null
 
     var showLeaveDialog by remember { mutableStateOf(false) }
     var alarmToDelete by remember { mutableStateOf<AlarmData?>(null) }
@@ -97,61 +78,26 @@ fun GroupDetailScreen(
         onDispose { listener.remove() }
     }
 
-    // Update de classement à chaque réouverture + quand alarme change
-    LaunchedEffect(groupId, groupAlarms) {
-        viewModel.loadGroupMembers(groupId)
-    }
+    // Mise à jour du classement à chaque réouverture + quand une alarme change
+    LaunchedEffect(groupId, groupAlarms) { viewModel.loadGroupMembers(groupId) }
 
-    Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 16.dp)) {
-
-        // Header
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-
-            // Bouton retour
-            BackButton(
-                onClick = onBackClick,
-            )
-
-            // Nom du groupe + nombre de membres
-            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "${group?.name ?: stringResource(R.string.default_group_name)} ${group?.emoji ?: ""}",
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = stringResource(R.string.active_members, group?.memberCount ?: 0),
-                    color = GraySubtitle,
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-
-                if (isMember) {
-                    // Bouton quitter le groupe
-                    HeaderButton(
-                        icon = Icons.AutoMirrored.Filled.ExitToApp,
-                        description = stringResource(R.string.leave_group),
-                        onClick = { showLeaveDialog = true }
-                    )
-                } else {
-                    // Bouton rejoindre le groupe
-                    Button(
-                        onClick = { viewModel.joinGroup(groupId) },
-                        modifier = Modifier.height(40.dp),
-                        shape = LittleRoundedCornerShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
-                    ) {
-                        Text(text = stringResource(R.string.join_group), style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-            }
-        }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        GroupHeader(
+            group = group,
+            isMember = isMember,
+            onBackClick = onBackClick,
+            onLeaveClick = { showLeaveDialog = true },
+            onJoinClick = { viewModel.joinGroup(groupId) }
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Afficher alarms si membre du groupe
+        // Alarmes : seulement si membre du groupe
         if (isMember) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -160,90 +106,65 @@ fun GroupDetailScreen(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
-                Button(
+                AppButton(
+                    text = stringResource(R.string.create_alarm),
                     onClick = { onCreateAlarmClick(groupId) },
-                    shape = LittleRoundedCornerShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenAccent)
-                ) {
-                    Text(stringResource(R.string.create_alarm), style = MaterialTheme.typography.labelSmall)
-                }
+                    fillWidth = false,
+                    height = 40.dp,
+                    textStyle = MaterialTheme.typography.labelSmall
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             if (groupAlarms.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.no_group_alarm),
-                    color = GraySubtitle,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                EmptyText(stringResource(R.string.no_group_alarm))
             }
 
-            groupAlarms.sortedWith(compareBy({ it.hour }, { it.minute })).forEach { alarm ->
-                val joined = uid != null && uid in alarm.participantIds
-                val owner = viewModel.groupMembers.find { it.id == alarm.ownerId }
-                val participants = viewModel.groupMembers.filter { it.id in alarm.participantIds }
-
-                AlarmCard(
-                    alarm = alarm,
-                    result = uid?.let { alarm.results[it] },
-                    owner = AlarmOwner(owner?.emoji ?: "🤔", owner?.username.orEmpty()),
-                    group = group?.let { AlarmGroup(it.emoji, it.name) },
-                    participantEmojis = participants.joinToString("") { it.emoji },
-                    participantCount = alarm.participantIds.size,
-                    actions = {
-                        AlarmActions(
-                            joined = joined,
-                            isOwner = uid != null && alarm.ownerId == uid,
-                            canLeave = uid?.let { alarm.results[it] } == null,
-                            canDelete = !alarm.hasRung,
-                            onToggleJoin = {
-                                if (uid != null) {
-                                    if (joined) AlarmRepository.leave(alarm.id, uid)
-                                    else AlarmRepository.join(alarm.id, uid)
-                                    AlarmSync.sync(context, uid)
-                                }
-                            },
-                            onDelete = { alarmToDelete = alarm }
-                        )
-                    }
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                groupAlarms.sortedByTime().forEach { alarm ->
+                    AlarmListItem(
+                        alarm = alarm,
+                        uid = uid,
+                        joined = uid != null && uid in alarm.participantIds,
+                        group = group,
+                        members = viewModel.groupMembers,
+                        showOwner = true,
+                        onToggleJoin = { a ->
+                            if (uid != null) {
+                                if (uid in a.participantIds) AlarmRepository.leave(a.id, uid)
+                                else AlarmRepository.join(a.id, uid)
+                                AlarmSync.sync(context, uid)
+                            }
+                        },
+                        onDelete = { alarmToDelete = it }
+                    )
+                }
             }
         }
 
-        LaunchedEffect(groupId) { viewModel.loadGroupMembers(groupId) } // Get group members
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = stringResource(R.string.leaderboard), color = Color.White, style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(12.dp))
-
-        viewModel.groupMembers.forEachIndexed { index, member ->
-            MemberRow(rank = index + 1, member = member)
-            Spacer(modifier = Modifier.height(8.dp))
+        // Classement
+        SectionTitle(stringResource(R.string.leaderboard), spacing = 12.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            viewModel.groupMembers.forEachIndexed { index, member ->
+                MemberRow(rank = index + 1, member = member)
+            }
         }
     }
 
     // Confirmation avant de quitter
     if (showLeaveDialog) {
-        AlertDialog(
-            onDismissRequest = { showLeaveDialog = false },
-            title = { Text(stringResource(R.string.leave_group_question)) },
-            text = { Text(stringResource(R.string.leave_group_description)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showLeaveDialog = false
-                    viewModel.leaveGroup(groupId, onSuccess = onBackClick)
-                }) {
-                    Text(stringResource(R.string.quit), color = RedFail)
-                }
+        ConfirmDialog(
+            title = stringResource(R.string.leave_group_question),
+            text = stringResource(R.string.leave_group_description),
+            confirmText = stringResource(R.string.quit),
+            onConfirm = {
+                showLeaveDialog = false
+                viewModel.leaveGroup(groupId, onSuccess = onBackClick)
             },
-            dismissButton = {
-                TextButton(onClick = { showLeaveDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
+            onDismiss = { showLeaveDialog = false }
         )
     }
 
@@ -252,28 +173,48 @@ fun GroupDetailScreen(
     }
 }
 
-// Bouton carré du header (retour, paramètres)
+// Retour + nom du groupe + nombre de membres + bouton quitter / rejoindre
 @Composable
-private fun HeaderButton(icon: ImageVector, description: String, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier.size(40.dp).background(FieldBg, MediumRoundedCornerShape).clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(imageVector = icon, contentDescription = description, tint = Color.White, modifier = Modifier.size(20.dp))
-    }
-}
+private fun GroupHeader(
+    group: Group?,
+    isMember: Boolean,
+    onBackClick: () -> Unit,
+    onLeaveClick: () -> Unit,
+    onJoinClick: () -> Unit
+) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        BackButton(onClick = onBackClick)
 
-@Composable
-private fun MemberRow(rank: Int, member: GroupMember) {
-    Row(
-        modifier = Modifier.fillMaxWidth().background(FieldBg, MediumRoundedCornerShape).padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = "$rank", color = GraySubtitle, modifier = Modifier.width(24.dp))
-        Text(text = member.emoji, fontSize = 18.sp)
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(text = member.username, color = Color.White, modifier = Modifier.weight(1f))
-        Text(text = "${member.points} pts", color = GreenAccent)
+        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "${group?.name ?: stringResource(R.string.default_group_name)} ${group?.emoji ?: ""}",
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = stringResource(R.string.active_members, group?.memberCount ?: 0),
+                color = GraySubtitle,
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            if (isMember) {
+                SquareIconButton(
+                    icon = Icons.AutoMirrored.Filled.ExitToApp,
+                    description = stringResource(R.string.leave_group),
+                    onClick = onLeaveClick
+                )
+            } else {
+                AppButton(
+                    text = stringResource(R.string.join_group),
+                    onClick = onJoinClick,
+                    fillWidth = false,
+                    height = 40.dp,
+                    textStyle = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
     }
 }
 
@@ -285,11 +226,8 @@ fun GroupDetailScreenPreview() {
             TODO("Retourner un GroupsOverview de test")
         }
         override suspend fun createGroup(name: String, emoji: String, description: String) {}
-
         override suspend fun joinGroup(groupId: String) {}
-
         override suspend fun leaveGroup(groupId: String) {}
-
         override suspend fun getGroupMembers(groupId: String): List<GroupMember> = emptyList()
     }
 
